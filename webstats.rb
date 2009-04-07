@@ -1,6 +1,9 @@
+require 'webrick'
 require 'rubygems'
-require 'rack'
-require 'mongrel'
+require 'json'
+require 'json/add/core'
+
+exit if fork
 
 class String
   def underscore
@@ -12,55 +15,55 @@ class String
   end
 end
 
-module DataProviders
+class Numeric
+  def formatted(precision = 1)
+    rounded_number = (Float(self) * (10 ** precision)).round.to_f / 10 ** precision
+    parts = ("%01.#{precision}f" % rounded_number).to_s.split('.')
+    parts[0].gsub!(/(\d)(?=(\d\d\d)+(?!\d))/, "\\1,")
+    parts.join(".")
+  end
 end
 
-class Webstats
-  def initialize
-    @data_sources = {}
-
+module DataProviders
+  DATA_SOURCES = {}
+  def self.setup
     Dir.glob("data_providers/*.rb").each { |file| load file }
     DataProviders.constants.each do |c|
       c = DataProviders.const_get(c)
-      @data_sources[c.to_s.gsub(/^DataProviders::/, '').underscore] = c.new if c.is_a? Class
+      DATA_SOURCES[c.to_s.gsub(/^DataProviders::/, '').underscore] = c.new if c.is_a? Class
     end
   end
+end
 
-  def call(env)
-    req = Rack::Request.new(env)
-    res = Rack::Response.new
+DataProviders.setup
 
+class Webstats < WEBrick::HTTPServlet::AbstractServlet
+  def do_GET(req, res)
+    body = ""
     if req.path_info == '/'
-      res.write <<-EOF
+      body << <<-EOF
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
   <head>
     <title>Webstats</title>
     <style type="text/css">
       * { margin: 0; padding: 0; font-family: "Lucida Grande", Helvetica, Arial, sans-serif; font-size: 100%; }
-      body { padding: 1em 1em 0 1em; font-size: 95%; }
+      body { font-size: 95%; }
       p { margin: 0 0 1em 0; }
-      ul { margin: -0.5em 0 1em 0; padding-left: 2.5em; }
-      li { margin: 0.1em; }
-      h1 { margin: -1em -1em 0.1em -1em; padding: 1em; background-color: #0033CC; color: #ffffff; font-weight: bold; }
-      h1 span { font-size: 200%; }
-      h2 { margin: 1em 0; border-bottom: 2px solid #C98300; font-weight: bold; }
-      h2 span { font-size: 115%; }
-      #footer { margin: 1.1em -1em -1em -1em; padding: 1em; background-color: #0033CC; color: #ffffff; }
-      #footer a { color: #BFCFFF; }
+
+      .source { width: 400px; border: 1px solid #000000; margin: 1em; }
+      .source h2 { padding: 0 0.8em 0 0.8em; background-color: #C98300; }
+      .source h2 span { font-size: 130%; font-weight: bold; padding: 0.2em 0; display: block; }
+      .source .source_contents { margin: 0.8em; }
+      .source .title { padding-right: 0.5em; }
+      .source .major_figure { font-size: 130%; margin: 0.3em 0; }
+      .source .major_figure .figure { font-size: 120%; font-weight: bold; font-family: Georgia, serif; }
+      .source .major_figure .unit { font-family: Georgia, serif; font-size: 70%; }
+      .source .minor_figure { font-family: Georgia, serif; }
+      .source .divider { margin-left: 0.2em; margin-right: 0.2em; font-weight: normal; }
     </style>
     <script type="text/javascript">
        var http = null;
-
-       function escapeHTML(str)
-       {
-          //code portion borrowed from prototype library
-          var div = document.createElement('div');
-          var text = document.createTextNode(str);
-          div.appendChild(text);
-          return div.innerHTML;
-          //end portion
-       }
 
        function getLatest()
        {
@@ -76,26 +79,49 @@ class Webstats
           {
             if(http.readyState == 4)
             {
-               document.getElementById("body").innerHTML = escapeHTML(http.responseText);
+               var results = eval("(" + http.responseText + ")");
+               if(!results) return;
+EOF
+
+      DataProviders::DATA_SOURCES.each_pair do |k, v|
+        r = v.renderer
+        body << %{data_source = results['#{k}']; document.getElementById('source_contents_#{k}').innerHTML = (#{r[:contents]});\n}
+      end
+
+body << <<-EOF
             }
          };
 
          window.setInterval("getLatest()", 5000);
+         getLatest();
       }
     </script>
   </head>
   <body id="body">
+    <div id="main">
+EOF
+      DataProviders::DATA_SOURCES.sort { |a, b| b[1].importance <=> a[1].importance }.each do |(k, v)|
+        r = v.renderer
+        body << %{<div class="source" id="source_#{k}"><h2><span>#{r[:name]}</span></h2><div class="source_contents" id="source_contents_#{k}">Loading...</div></div>}
+      end
+
+      body << <<-EOF
+    </div>
   </body>
 </html>
 EOF
     elsif req.path_info == '/update'
       out = {}
-      @data_sources.each_pair { |k, v| out[k] = v.get }
-      res.write out.inspect
+      DataProviders::DATA_SOURCES.each_pair { |k, v| out[k] = v.get }
+      body << out.to_json
     end
 
-    res.finish
+    res.body = body
+    res['Content-Type'] = "text/html"
   end
 end
 
-Rack::Handler::Mongrel.run(Webstats.new, { :Port => 9970 })
+s = WEBrick::HTTPServer.new(:Port => 9970, :Logger => WEBrick::Log.new(nil, 0))
+trap("INT") { s.shutdown }
+s.mount("/", Webstats)
+s.start

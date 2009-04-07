@@ -33,14 +33,21 @@ class DataProviders::CpuInfo
     
   def get
     out = {}
-
-#    user, nice, system, idle, iowait, crap = IO.readlines("/proc/stat").first.split(' ', 6).map { |i| i.to_i }
-#    puts "user: #{user}, nice: #{nice}, system: #{system}, idle: #{idle}, iowait: #{iowait}"
-#    out[:usage] = ((user + nice + system + iowait) / idle.to_f) * 100
-    out[:usage] = @usage
-
-    out[:loadvg_1], out[:loadvg_5], out[:loadvg_15] = IO.readlines("/proc/loadavg").first.split(' ', 4)
-    
+    out[:usage] = @usage.formatted
+    out[:loadavg_1], out[:loadavg_5], out[:loadavg_15] = IO.readlines("/proc/loadavg").first.split(' ', 4).map { |v| v.to_f.formatted }
     out
+  end
+
+  def renderer
+    { :name => "CPU Info", :contents => %{
+"<div class='major_figure'><span class='title'>Usage</span><span class='figure'>" + data_source['usage'] + "</span><span class='unit'>%</span></div>" + 
+"<div class='major_figure'><span class='title'>Load average</span><span class='figure'>" + data_source['loadavg_1'] +
+"</span><span class='unit'>1m</span><span class='divider'>/</span><span class='figure'>" + data_source['loadavg_5'] +
+"</span><span class='unit'>5m</span><span class='divider'>/</span><span class='figure'>" + data_source['loadavg_15'] + "</span><span class='unit'>15m</span></div>"
+} }
+  end
+
+  def importance
+    100
   end
 end

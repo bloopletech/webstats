@@ -26,6 +26,17 @@ class DataProviders::DiskInfo
   end
 
   def get
-    { :reads => @reads_sec, :writes => @writes_sec }
+    { :reads => (@reads_sec / 1024.0).formatted, :writes => (@writes_sec / 1024.0).formatted }
+  end
+
+  def renderer
+    { :name => "Disk Info", :contents => %{
+"<div class='major_figure'><span class='title'>Reads</span><span class='figure'>" + data_source['reads'] + "</span><span class='unit'>mb/s</span></div>" +
+"<div class='major_figure'><span class='title'>Writes</span><span class='figure'>" + data_source['writes'] + "</span><span class='unit'>mb/s</span></div>"
+} }
+  end
+
+  def importance
+    80
   end
 end
