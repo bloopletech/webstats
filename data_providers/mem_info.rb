@@ -18,4 +18,7 @@ class DataProviders::MemInfo
   def importance
     90
   end
+
+  def kill
+  end
 end

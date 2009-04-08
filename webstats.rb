@@ -1,9 +1,8 @@
 require 'webrick'
-require 'rubygems'
-require 'json'
-require 'json/add/core'
 
 exit if fork
+$stdout = File.new('/dev/null', 'w')
+$stderr = File.new('/dev/null', 'w')
 
 class String
   def underscore
@@ -13,6 +12,7 @@ class String
      tr("-", "_").
      downcase
   end
+  alias_method :to_json, :inspect
 end
 
 class Numeric
@@ -21,6 +21,27 @@ class Numeric
     parts = ("%01.#{precision}f" % rounded_number).to_s.split('.')
     parts[0].gsub!(/(\d)(?=(\d\d\d)+(?!\d))/, "\\1,")
     parts.join(".")
+  end
+  alias_method :to_json, :inspect
+end
+
+class Array
+  def to_json
+    "[#{map { |e| e.to_json }.join(',')}]"
+  end
+end
+
+class Hash
+  def to_json
+    arr = []
+    each_pair { |k, v| arr << "#{k.to_json}:#{v.to_json}" }
+    "{#{arr.join(',')}}"
+  end
+end
+
+class Symbol
+  def to_json
+    to_s.inspect
   end
 end
 
@@ -50,6 +71,9 @@ class Webstats < WEBrick::HTTPServlet::AbstractServlet
       * { margin: 0; padding: 0; font-family: "Lucida Grande", Helvetica, Arial, sans-serif; font-size: 100%; }
       body { font-size: 95%; }
       p { margin: 0 0 1em 0; }
+
+      h1 { margin: 1em; }
+      h1 span { font-size: 160%; font-weight: bold; }
 
       .source { width: 400px; border: 1px solid #000000; margin: 1em; }
       .source h2 { padding: 0 0.8em 0 0.8em; background-color: #C98300; }
@@ -99,6 +123,7 @@ body << <<-EOF
   </head>
   <body id="body">
     <div id="main">
+      <h1><span>Stats for #{req.host}</span></h1>
 EOF
       DataProviders::DATA_SOURCES.sort { |a, b| b[1].importance <=> a[1].importance }.each do |(k, v)|
         r = v.renderer
@@ -121,7 +146,14 @@ EOF
   end
 end
 
-s = WEBrick::HTTPServer.new(:Port => 9970, :Logger => WEBrick::Log.new(nil, 0))
-trap("INT") { s.shutdown }
+s = WEBrick::HTTPServer.new(:Port => 9970)
+
+death = proc do
+  s.shutdown
+  DataProviders::DATA_SOURCES.each_pair { |k, v| v.kill }
+end
+trap("INT", death)
+trap("TERM", death)
+
 s.mount("/", Webstats)
 s.start

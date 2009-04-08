@@ -2,7 +2,7 @@ class DataProviders::CpuInfo
   def initialize
     @usage = 0
 
-    Thread.new do
+    @thread = Thread.new do
       last_time = last_user = last_nice = last_system = last_idle = last_iowait = 0
       first_time = true
       while(true)
@@ -26,7 +26,7 @@ class DataProviders::CpuInfo
         last_idle = idle
         last_iowait = iowait
         last_time = time
-        sleep(1)
+        sleep(2.5)
       end
     end
   end  
@@ -49,5 +49,9 @@ class DataProviders::CpuInfo
 
   def importance
     100
+  end
+
+  def kill
+    @thread.kill
   end
 end

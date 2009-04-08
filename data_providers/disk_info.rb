@@ -3,7 +3,7 @@ class DataProviders::DiskInfo
     @reads_sec = 0
     @writes_sec = 0
 
-    Thread.new do
+    @thread = Thread.new do
       last_time = last_reads = last_writes = 0
       first_time = true
       while(true)
@@ -20,7 +20,7 @@ class DataProviders::DiskInfo
         last_reads = reads
         last_writes = writes
         last_time = time
-        sleep(1)
+        sleep(2.5)
       end
     end
   end
@@ -38,5 +38,9 @@ class DataProviders::DiskInfo
 
   def importance
     80
+  end
+
+  def kill
+    @thread.kill
   end
 end
