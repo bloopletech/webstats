@@ -1,0 +1,7 @@
+Webstats
+========
+
+Full docs coming soon, but for now, run "ruby webstats.rb", it'll daemonize itself and run a mini webserver on port 9970.
+To view stats, go to http://<domain>:9970/
+
+Requires Linux kernel 2.6+, will not work in *BSD or OS X.
