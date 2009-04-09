@@ -24,7 +24,7 @@ class DataProviders::MemInfo
     @mutex.synchronize do
       out = @readings.first
       out[:status] = 'warning' unless @readings.detect { |r| r[:free] > 5 }
-      out[:status] = 'danger' if @readings.detect { |r| r[:free_total] <= 1 }
+      out[:status] = 'danger' unless @readings.detect { |r| r[:free_total] > 1 }
     end
     out
   end

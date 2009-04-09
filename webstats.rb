@@ -1,9 +1,9 @@
 require 'webrick'
 
-#exit if fork
-#$stdout = File.new('/dev/null', 'w')
-#$stderr = File.new('/dev/null', 'w')
-Thread.abort_on_exception
+exit if fork
+$stdout = File.new('/dev/null', 'w')
+$stderr = File.new('/dev/null', 'w')
+#Thread.abort_on_exception
 
 class String
   def underscore
@@ -75,11 +75,13 @@ class Webstats < WEBrick::HTTPServlet::AbstractServlet
 
       h1 { margin: 1em; }
       h1 span { font-size: 160%; font-weight: bold; }
+      .source .danger { background-color: #FF0D33; }
+      .source .warning { background-color: #F1FF28; }
 
       .source { width: 400px; border: 1px solid #000000; margin: 1em; }
       .source h2 { padding: 0 0.8em 0 0.8em; background-color: #C98300; }
       .source h2 span { font-size: 130%; font-weight: bold; padding: 0.2em 0; display: block; }
-      .source .source_contents { margin: 0.8em; }
+      .source .source_contents { padding: 0.8em; }
       .source .title { padding-right: 0.5em; }
       .source .major_figure { font-size: 130%; margin: 0.3em 0; }
       .source .major_figure .figure { font-size: 120%; font-weight: bold; font-family: Georgia, serif; }
