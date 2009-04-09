@@ -1,6 +1,7 @@
 class DataProviders::CpuInfo
   def initialize
-    @usage = 0
+    @readings = []
+    @mutex = Mutex.new
 
     @thread = Thread.new do
       last_time = last_user = last_nice = last_system = last_idle = last_iowait = 0
@@ -18,7 +19,11 @@ class DataProviders::CpuInfo
           temp_system = (system - last_system)
           temp_idle = (idle - last_idle)
           temp_iowait = (iowait - last_iowait)
-          @usage = ((temp_user + temp_nice + temp_system) / (temp_idle.to_f < 1 ? 1 : temp_idle.to_f))
+
+          @mutex.synchronize do
+            @readings.unshift(((temp_user + temp_nice + temp_system) / (temp_idle.to_f < 1 ? 1 : temp_idle.to_f)).formatted)
+            @readings.pop while @readings.length > 5
+          end
         end
         last_user = user
         last_nice = nice
@@ -33,7 +38,11 @@ class DataProviders::CpuInfo
     
   def get
     out = {}
-    out[:usage] = @usage.formatted
+    @mutex.synchronize do
+      out[:usage] = @readings.first
+      out[:status] = 'warning' unless @readings.detect { |r| out[:usage] < 95 }
+      out[:status] = 'danger' unless @readings.detect { |r| out[:usage] < 99.5 }
+    end
     out[:loadavg_1], out[:loadavg_5], out[:loadavg_15] = IO.readlines("/proc/loadavg").first.split(' ', 4).map { |v| v.to_f.formatted }
     out
   end

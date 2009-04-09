@@ -1,8 +1,9 @@
 require 'webrick'
 
-exit if fork
-$stdout = File.new('/dev/null', 'w')
-$stderr = File.new('/dev/null', 'w')
+#exit if fork
+#$stdout = File.new('/dev/null', 'w')
+#$stderr = File.new('/dev/null', 'w')
+Thread.abort_on_exception
 
 class String
   def underscore
@@ -20,7 +21,7 @@ class Numeric
     rounded_number = (Float(self) * (10 ** precision)).round.to_f / 10 ** precision
     parts = ("%01.#{precision}f" % rounded_number).to_s.split('.')
     parts[0].gsub!(/(\d)(?=(\d\d\d)+(?!\d))/, "\\1,")
-    parts.join(".")
+    parts.join(".").to_f
   end
   alias_method :to_json, :inspect
 end
@@ -108,8 +109,7 @@ class Webstats < WEBrick::HTTPServlet::AbstractServlet
 EOF
 
       DataProviders::DATA_SOURCES.each_pair do |k, v|
-        r = v.renderer
-        body << %{data_source = results['#{k}']; document.getElementById('source_contents_#{k}').innerHTML = (#{r[:contents]});\n}
+        body << %{var data_source = results['#{k}']; var sc = document.getElementById('source_contents_#{k}'); sc.className = "source_contents " + (data_source['status'] ? data_source['status'] : ''); sc.innerHTML = (#{v.renderer[:contents]});\n}
       end
 
 body << <<-EOF
