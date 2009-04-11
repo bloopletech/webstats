@@ -39,12 +39,12 @@ class DataProviders::CpuInfo
   def get
     out = {}
     @mutex.synchronize do
-      out[:usage] = @readings.first
+      out[:usage] = @readings.first.formatted
       out[:status] = 'warning' unless @readings.detect { |r| out[:usage] < 95 }
       out[:status] = 'danger' unless @readings.detect { |r| out[:usage] < 99.5 }
     end
-    out[:loadavg_1], out[:loadavg_5], out[:loadavg_15] = IO.readlines("/proc/loadavg").first.split(' ', 4).map { |v| v.to_f }
-    out.formatted
+    out[:loadavg_1], out[:loadavg_5], out[:loadavg_15] = IO.readlines("/proc/loadavg").first.split(' ', 4).map { |v| v.to_f.formatted }
+    out
   end
 
   def renderer

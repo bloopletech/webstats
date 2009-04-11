@@ -151,7 +151,7 @@ EOF
       body << out.to_json
     elsif req.path_info == '/information'
       out = {}
-      DataProviders::DATA_SOURCES.each_pair { |k, v| out[k] = v.info }
+      DataProviders::DATA_SOURCES.each_pair { |k, v| out[k] = v.information }
       body << out.to_json
     end
 
