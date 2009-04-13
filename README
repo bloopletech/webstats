@@ -1,7 +1,41 @@
 Webstats
 ========
 
-Full docs coming soon, but for now, run "ruby server/webstats.rb", it'll daemonize itself and run a mini webserver on port 9970.
-To view stats, go to http://<domain>:9970/
+Webstats is a server and clients that monitors your servers performance (CPU usage, memory usage, disk usage) and allows you to get notifications on your computer when the server is having problems, as well as showing the current performance stats for the server on a web page.
 
-Requires Linux kernel 2.6+, will not work in *BSD or OS X.
+Webstats has 2 components: the _server_ and one or more _clients_.
+
+Server
+------
+The server runs on the computer whose performance you want to monitor; the server application's job is to (1) monitor the computer's performance and (2) report these performance statistics through a webserver that the server app runs.
+
+To install the server app, ssh into the computer you want to monitor. then run:
+~$ git clone git://github.com/bloopletech/webstats.git
+
+To run the server app, ssh into the computer you want to monitor. then run:
+~$ cd webstats
+~/webstats$ ruby server/webstats.rb
+
+The server app will execute in the background and start a mini webserver on port 9970. You can view the performance stats for your server by going to http://<server's hostname>:9970/, for example if my server was under the domain name bloople.net, I would go to http://bloople.net:9970/ to see my performance stats. Going to this URL presents you with the latest stats on your server, updated every 5 seconds.
+
+All the client applications depend on the server application being run to work.
+
+The server application requires Linux kernel 2.6+, will not work in *BSD or OS X.
+
+Clients
+-------
+If all you want to do is be able to view the performance stats for your server in a web browser, then you don't need to use any of these clients; going to http://<server's hostname>:9970/ will do just fine. But if you want to have Growl or email notification when something goes wrong, without having to look at a web page all the time, then you'll want one of the client applications that come with Webstats.
+
+Right now there's only one client application available, which is a Growl notifier. The Growl notifier only works on OS X, with RubyCocoa installed. This application runs in the background and monitors the server; if the server goes under high CPU load for more than a few seconds, or if the server is nearly out of memory, you'll get a Growl notification saying what the problem is. This way, you can just set and forget, knowing that Webstats will report any problems.
+
+To run the Growl notifier, open a terminal on your computer, then run (the first line is only needed the first time you run the notifier):
+~$ git clone git://github.com/bloopletech/webstats.git
+~$ cd webstats/clients/growl_notifier
+~/webstats/clients/growl_notifier$ ruby growl_notifier.rb http://<server's hostname>:9970/
+
+Where server's hostname is the host name of the server you want to monitor (e.g. bloople.net). The Growl notifier will then run in the background.
+
+Todo
+----
+* More client applications.
+* Extend server to work on *BSD (including OS X).
