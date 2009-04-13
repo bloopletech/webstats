@@ -1,7 +1,7 @@
 Webstats
 ========
 
-Webstats is a server and clients that monitors your servers performance (CPU usage, memory usage, disk usage) and allows you to get notifications on your computer when the server is having problems, as well as showing the current performance stats for the server on a web page.
+Webstats is a server and clients that monitors your servers performance (CPU usage, memory usage, disk usage) and allows you to get notifications on your computer when the server is having problems, as well as showing (http://kimag.es/share/91090734.png) the current performance stats for the server on a web page.
 
 Webstats has 2 components: the _server_ and one or more _clients_.
 
