@@ -20,7 +20,7 @@ The server app will execute in the background and start a mini webserver on port
 
 All the client applications depend on the server application being run to work.
 
-The server application requires Linux kernel 2.6+, will not work in *BSD or OS X. The server application requires only Ruby; it does not relay on rubygems or any external libraries that aren't included with Ruby. You may need to open port 9970 if you have a firewall on your server.
+The server application requires Linux kernel 2.6+, will not work in *BSD or OS X. The server application requires only Ruby; it does not relay on rubygems or any external libraries that aren't included with Ruby. You may need to open port 9970 if you have a firewall on your server. The server application uses very little RAM, approximately 7MB (at least in testing).
 
 Clients
 -------
