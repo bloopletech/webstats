@@ -23,7 +23,7 @@ class Numeric
   def formatted(precision = 1)
     rounded_number = (Float(self) * (10 ** precision)).round.to_f / 10 ** precision
     parts = ("%01.#{precision}f" % rounded_number).to_s.split('.')
-    parts[0].gsub!(/(\d)(?=(\d\d\d)+(?!\d))/, "\1,")
+    parts[0].gsub!(/(\d)(?=(\d\d\d)+(?!\d))/, "\\1,")
     parts.join(".")
   end
   alias_method :to_json, :inspect
