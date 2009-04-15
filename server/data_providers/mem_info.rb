@@ -8,7 +8,6 @@ class DataProviders::MemInfo
         out = {}
         out[:total], out[:free], out[:buffers], out[:cached] = IO.readlines("/proc/meminfo")[0..4].map { |l| l =~ /^.*?\: +(.*?) kB$/; $1.to_i / 1024.0 }
         out[:free_total] = out[:free] + out[:buffers] + out[:cached]
-        out.each_pair { |k, v| out[k] = v.formatted }
 
         @mutex.synchronize do
           @readings.unshift(out)

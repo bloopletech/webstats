@@ -26,7 +26,7 @@ class DataProviders::DiskInfo
   end
 
   def get
-    { :reads => (@reads_sec / 1024.0).formatted, :writes => (@writes_sec / 1024.0).formatted }
+    { :reads => @reads_sec / 1024.0, :writes => @writes_sec / 1024.0 }
   end
 
   def renderer

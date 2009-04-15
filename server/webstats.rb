@@ -23,8 +23,8 @@ class Numeric
   def formatted(precision = 1)
     rounded_number = (Float(self) * (10 ** precision)).round.to_f / 10 ** precision
     parts = ("%01.#{precision}f" % rounded_number).to_s.split('.')
-    parts[0].gsub!(/(\d)(?=(\d\d\d)+(?!\d))/, "\\1,")
-    parts.join(".").to_f
+    parts[0].gsub!(/(\d)(?=(\d\d\d)+(?!\d))/, "\1,")
+    parts.join(".")
   end
   alias_method :to_json, :inspect
 end
@@ -147,7 +147,10 @@ EOF
 EOF
     elsif req.path_info == '/update'
       out = {}
-      DataProviders::DATA_SOURCES.each_pair { |k, v| out[k] = v.get }
+      DataProviders::DATA_SOURCES.each_pair do |k, v|
+        out[k] = v.get
+        out[k].each_pair { |k2, v2| out[k][k2] = v2.formatted if v2.is_a? Numeric }
+      end
       body << out.to_json
     elsif req.path_info == '/information'
       out = {}
