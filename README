@@ -16,11 +16,11 @@ To run the server app, ssh into the computer you want to monitor. then run:
 ~$ cd webstats
 ~/webstats$ ruby server/webstats.rb
 
-The server app will execute in the background and start a mini webserver on port 9970. You can view the performance stats for your server by going to http://<server's hostname>:9970/, for example if my server was under the domain name bloople.net, I would go to http://bloople.net:9970/ to see my performance stats. Going to this URL presents you with the latest stats on your server, updated every 5 seconds.
+The server app will execute in the background and start a mini webserver on port 9970. You can view the performance stats for your server by going to http://<server's hostname>:9970/, for example if my server was under the domain name bloople.net, I would go to http://bloople.net:9970/ to see my performance stats. The statistics on this page automatically update every 5 seconds. You may need to open port 9970 if you have a firewall on your server.
 
 All the client applications depend on the server application being run to work.
 
-The server application requires Linux kernel 2.6+, will not work in *BSD or OS X. The server application requires only Ruby; it does not relay on rubygems or any external libraries that aren't included with Ruby. You may need to open port 9970 if you have a firewall on your server. The server application uses very little RAM, approximately 7MB (at least in testing).
+The server application requires Linux kernel 2.6+, will not work in *BSD or OS X; the server application requires only Ruby; it does not relay on rubygems or any external libraries that aren't included with Ruby; the server application uses very little RAM, approximately 7MB.
 
 Clients
 -------
