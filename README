@@ -37,5 +37,13 @@ Where server's hostname is the host name of the server you want to monitor (e.g.
 
 Todo
 ----
+* (Coming soon) Add disk space remaining, with warnings / danger signals.
+* (Coming soon) Add optional authentication to server application.
+* (Coming soon) Make webstats configurable.
+* Add email notifier to client applications.
 * More client applications.
 * Extend server to work on *BSD (including OS X).
+* Make webstats server optionally install itself to run at boot.
+* Make client applications optionally install themselves at boot, where suitable.
+* Make into a gem?
+* (Maybe) Move all server code into it's own module and make code work without running the web server, so you can use it to just grab stats in your own code.
