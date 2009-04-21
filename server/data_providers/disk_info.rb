@@ -33,7 +33,7 @@ class DataProviders::DiskInfo
       parts = mp.split
       next unless parts[3].split(",").detect { |p| p == "rw" }
       du = get_disk_usage(parts[1])
-      out[:mounts] << [parts[1], du] unless du['total'] == 0 or (du['total'] > 10485760 && (du['total'] - du['free'] <= 1048576))
+      out[:mounts] << [parts[1], du] unless du['total'] == 0 or (du['total'] > 5242880 && ((du['total'] - du['free']) <= 1048576))
     end
 
     out[:mounts].map do |mp|
