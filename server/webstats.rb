@@ -8,6 +8,13 @@ else
   $stderr = File.new('/dev/null', 'w')
 end
 
+Thread.new do
+  while(true)
+    sleep(300)
+    GC.start
+  end
+end
+
 class String
   def underscore
     self.gsub(/::/, '/').
@@ -151,30 +158,6 @@ EOF
         out[k] = v.get
       end
 
-      def fix_leaves_array(array)
-        array.each_with_index do |v, i|
-          if v.is_a? Numeric
-            array[i] = v.formatted
-          elsif v.is_a? Hash
-            array[i] = fix_leaves_hash(array[i])
-          elsif v.is_a? Array
-            array[i] = fix_leaves_array(array[i])
-          end
-        end
-      end
-
-      def fix_leaves_hash(hash)
-        hash.each_pair do |k, v|
-          if v.is_a? Numeric
-            hash[k] = v.formatted
-          elsif v.is_a? Hash
-            hash[k] = fix_leaves_hash(hash[k])
-          elsif v.is_a? Array
-            hash[k] = fix_leaves_array(hash[k])
-          end
-        end
-      end
-
       fix_leaves_hash(out)
 
       body << out.to_json
@@ -186,6 +169,31 @@ EOF
 
     res.body = body
     res['Content-Type'] = "text/html"
+  end
+
+  private
+  def fix_leaves_array(array)
+    array.each_with_index do |v, i|
+      if v.is_a? Numeric
+        array[i] = v.formatted
+      elsif v.is_a? Hash
+        array[i] = fix_leaves_hash(array[i])
+      elsif v.is_a? Array
+        array[i] = fix_leaves_array(array[i])
+      end
+    end
+  end
+
+  def fix_leaves_hash(hash)
+    hash.each_pair do |k, v|
+      if v.is_a? Numeric
+        hash[k] = v.formatted
+      elsif v.is_a? Hash
+        hash[k] = fix_leaves_hash(hash[k])
+      elsif v.is_a? Array
+        hash[k] = fix_leaves_array(hash[k])
+      end
+    end
   end
 end
 
