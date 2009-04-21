@@ -76,6 +76,8 @@ DataProviders.setup
 
 class Webstats < WEBrick::HTTPServlet::AbstractServlet
   def do_GET(req, res)
+    WEBrick::HTTPAuth.basic_auth(req, res, "Webstats") { |user, pass| user == 'webstats' and pass == ARGV[0] } unless ARGV.empty?
+
     body = ""
     if req.path_info == '/'
       body << <<-EOF

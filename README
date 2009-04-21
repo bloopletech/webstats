@@ -22,9 +22,15 @@ To run the server app, ssh into the computer you want to monitor. then run:
 
 The server app will execute in the background and start a mini webserver on port 9970. You can view the performance stats for your server by going to http://<server's hostname>:9970/, for example if my server was under the domain name bloople.net, I would go to http://bloople.net:9970/ to see my performance stats. The statistics on this page automatically update every 5 seconds. You may need to open port 9970 if you have a firewall on your server.
 
-All the client applications depend on the server application being run to work.
+You can prevent public access to your webstats by running the server application like so:
+~$ cd webstats
+~/webstats$ ruby server/webstats.rb <password>
+
+Then, when you visit the webstats, you'll be prompted for a username and password; the username is always 'webstats', and the password is the password specified just above.
 
 The server application requires Linux kernel 2.6+, will not work in *BSD or OS X; the server application requires only Ruby; it does not relay on rubygems or any external libraries that aren't included with Ruby; the server application uses very little RAM, approximately 7MB.
+
+All the client applications depend on the server application being run to work.
 
 Clients
 -------
@@ -41,8 +47,8 @@ Where server's hostname is the host name of the server you want to monitor (e.g.
 
 Todo
 ----
-* (Coming soon) Add disk space remaining, with warnings / danger signals.
-* (Coming soon) Add optional authentication to server application.
+* (DONE) (Coming soon) Add disk space remaining, with warnings / danger signals.
+* (DONE) (Coming soon) Add optional authentication to server application.
 * (Coming soon) Make webstats configurable.
 * Add email notifier to client applications.
 * More client applications.
