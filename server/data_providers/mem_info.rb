@@ -19,20 +19,22 @@ class DataProviders::MemInfo
   end
 
   def get
-    out = {}
+    out = { :total => 0, :free => 0, :buffers => 0, :cached => 0, :free_total => 0 }
     @mutex.synchronize do
-      out = @readings.first
-      out[:status] = 'warning' unless @readings.detect { |r| r[:free] > 5 }
-      out[:status] = 'danger' unless @readings.detect { |r| r[:free_total] > 1 }
+      unless @readings.empty?
+        out = @readings.first.dup
+        out[:status] = 'warning' unless @readings.detect { |r| r[:free] > 5 }
+        out[:status] = 'danger' unless @readings.detect { |r| r[:free_total] > 1 }
+      end
     end
     out
   end
 
   def renderer
     information.merge({ :contents => %{
-"<div class='major_figure'><span class='title'>Free</span><span class='figure'>" + data_source['free'] + "</span><span class='unit'>mb</span></div>" +
+sc.innerHTML = "<div class='major_figure'><span class='title'>Free</span><span class='figure'>" + data_source['free'] + "</span><span class='unit'>mb</span></div>" +
 "<div class='major_figure'><span class='title'>Free -buffers/cache</span><span class='figure'>" + data_source['free_total'] + "</span><span class='unit'>mb</span></div>" +
-"<div class='major_figure'><span class='title'>Total</span><span class='figure'>" + data_source['total'] + "</span><span class='unit'>mb</span></div>"
+"<div class='major_figure'><span class='title'>Total</span><span class='figure'>" + data_source['total'] + "</span><span class='unit'>mb</span></div>";
 } })
   end
 

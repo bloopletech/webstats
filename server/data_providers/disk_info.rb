@@ -26,13 +26,39 @@ class DataProviders::DiskInfo
   end
 
   def get
-    { :reads => @reads_sec / 1024.0, :writes => @writes_sec / 1024.0 }
+    out = { :reads => @reads_sec / 1024.0, :writes => @writes_sec / 1024.0, :mounts => [] }
+
+    mtab = IO.readlines("/etc/mtab").sort_by { |l| l.split[1] }
+    mtab.map do |mp|
+      parts = mp.split
+      next unless parts[3].split(",").detect { |p| p == "rw" }
+      du = get_disk_usage(parts[1])
+      out[:mounts] << [parts[1], du] unless du['total'] == 0
+    end
+
+    out[:mounts].map do |mp|
+      mp[1]['free'] /= (1024.0 * 1024)
+      mp[1]['total'] /= (1024.0 * 1024)
+      out[:status] = "warning" if mp[1]['free'] < 50 and mp[1]['total'] > 100 and out[:status] != 'danger'
+      out[:status] = "danger" if mp[1]['free'] < 10 and mp[1]['total'] > 20
+    end
+
+    out
   end
 
   def renderer
     information.merge({ :name => "Disk Info", :in_sentence => "Disk Usage", :importance => importance, :contents => %{
-"<div class='major_figure'><span class='title'>Reads</span><span class='figure'>" + data_source['reads'] + "</span><span class='unit'>mb/s</span></div>" +
-"<div class='major_figure'><span class='title'>Writes</span><span class='figure'>" + data_source['writes'] + "</span><span class='unit'>mb/s</span></div>"
+var temp = "<div class='major_figure'><span class='title'>Reads</span><span class='figure'>" + data_source['reads'] + "</span><span class='unit'>mb/s</span></div>" +
+"<div class='major_figure'><span class='title'>Writes</span><span class='figure'>" + data_source['writes'] + "</span><span class='unit'>mb/s</span></div>";
+for(var i = 0; i < data_source['mounts'].length; i++)
+{
+   var mpd = data_source['mounts'][i][1];
+   temp += "<div class='major_figure'><span class='title'>" + data_source['mounts'][i][0] + "</span><span class='figure'>" + mpd['free'] +
+    "</span><span class='unit'>mb free</span><span class='divider'>/</span><span class='figure'>" + mpd['total'] +
+     "</span><span class='unit'>mb total</span></div>";
+}
+
+sc.innerHTML = temp;
 } })
   end
 
@@ -48,3 +74,5 @@ class DataProviders::DiskInfo
     @thread.kill
   end
 end
+
+require File.dirname(__FILE__) + '/disk_info.so'

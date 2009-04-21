@@ -86,7 +86,7 @@ class Webstats < WEBrick::HTTPServlet::AbstractServlet
       .source .danger { background-color: #FF0D33; }
       .source .warning { background-color: #F1FF28; }
 
-      .source { width: 400px; border: 1px solid #000000; margin: 1em; }
+      .source { width: 500px; border: 1px solid #000000; margin: 1em; }
       .source h2 { padding: 0 0.8em 0 0.8em; background-color: #C98300; }
       .source h2 span { font-size: 130%; font-weight: bold; padding: 0.2em 0; display: block; }
       .source .source_contents { padding: 0.8em; }
@@ -119,7 +119,7 @@ class Webstats < WEBrick::HTTPServlet::AbstractServlet
 EOF
 
       DataProviders::DATA_SOURCES.each_pair do |k, v|
-        body << %{var data_source = results['#{k}']; var sc = document.getElementById('source_contents_#{k}'); sc.className = "source_contents " + (data_source['status'] ? data_source['status'] : ''); sc.innerHTML = (#{v.renderer[:contents]});\n}
+        body << %{var data_source = results['#{k}']; var sc = document.getElementById('source_contents_#{k}'); sc.className = "source_contents " + (data_source['status'] ? data_source['status'] : ''); #{v.renderer[:contents]}\n}
       end
 
 body << <<-EOF
@@ -149,8 +149,34 @@ EOF
       out = {}
       DataProviders::DATA_SOURCES.each_pair do |k, v|
         out[k] = v.get
-        out[k].each_pair { |k2, v2| out[k][k2] = v2.formatted if v2.is_a? Numeric }
       end
+
+      def fix_leaves_array(array)
+        array.each_with_index do |v, i|
+          if v.is_a? Numeric
+            array[i] = v.formatted
+          elsif v.is_a? Hash
+            array[i] = fix_leaves_hash(array[i])
+          elsif v.is_a? Array
+            array[i] = fix_leaves_array(array[i])
+          end
+        end
+      end
+
+      def fix_leaves_hash(hash)
+        hash.each_pair do |k, v|
+          if v.is_a? Numeric
+            hash[k] = v.formatted
+          elsif v.is_a? Hash
+            hash[k] = fix_leaves_hash(hash[k])
+          elsif v.is_a? Array
+            hash[k] = fix_leaves_array(hash[k])
+          end
+        end
+      end
+
+      fix_leaves_hash(out)
+
       body << out.to_json
     elsif req.path_info == '/information'
       out = {}

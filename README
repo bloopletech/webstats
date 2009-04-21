@@ -11,6 +11,10 @@ The server runs on the computer whose performance you want to monitor; the serve
 
 To install the server app, ssh into the computer you want to monitor. then run:
 ~$ git clone git://github.com/bloopletech/webstats.git
+~$ cd webstats
+~/webstats$ cd server/data_providers
+~/webstats/server/data_providers$ ruby extconf.rb
+~/webstats/server/data_providers$ make
 
 To run the server app, ssh into the computer you want to monitor. then run:
 ~$ cd webstats

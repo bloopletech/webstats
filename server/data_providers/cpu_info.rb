@@ -37,11 +37,13 @@ class DataProviders::CpuInfo
   end  
     
   def get
-    out = {}
+    out = { :usage => 0 }
     @mutex.synchronize do
-      out[:usage] = @readings.first
-      out[:status] = 'warning' unless @readings.detect { |r| out[:usage] < 95 }
-      out[:status] = 'danger' unless @readings.detect { |r| out[:usage] < 99.5 }
+      unless @readings.empty?
+        out[:usage] = @readings.first
+        out[:status] = 'warning' unless @readings.detect { |r| out[:usage] < 95 }
+        out[:status] = 'danger' unless @readings.detect { |r| out[:usage] < 99.5 }
+      end
     end
     out[:loadavg_1], out[:loadavg_5], out[:loadavg_15] = IO.readlines("/proc/loadavg").first.split(' ', 4).map { |v| v.to_f }
     out
@@ -49,10 +51,10 @@ class DataProviders::CpuInfo
 
   def renderer
     information.merge({ :contents => %{
-"<div class='major_figure'><span class='title'>Usage</span><span class='figure'>" + data_source['usage'] + "</span><span class='unit'>%</span></div>" + 
+sc.innerHTML = "<div class='major_figure'><span class='title'>Usage</span><span class='figure'>" + data_source['usage'] + "</span><span class='unit'>%</span></div>" + 
 "<div class='major_figure'><span class='title'>Load average</span><span class='figure'>" + data_source['loadavg_1'] +
 "</span><span class='unit'>1m</span><span class='divider'>/</span><span class='figure'>" + data_source['loadavg_5'] +
-"</span><span class='unit'>5m</span><span class='divider'>/</span><span class='figure'>" + data_source['loadavg_15'] + "</span><span class='unit'>15m</span></div>"
+"</span><span class='unit'>5m</span><span class='divider'>/</span><span class='figure'>" + data_source['loadavg_15'] + "</span><span class='unit'>15m</span></div>";
 } })
   end
 
