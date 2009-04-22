@@ -28,7 +28,7 @@ You can prevent public access to your webstats by running the server application
 
 Then, when you visit the webstats, you'll be prompted for a username and password; the username is always 'webstats', and the password is the password specified just above.
 
-The server application requires Linux kernel 2.6+, will not work in *BSD or OS X; the server application requires only Ruby; it does not relay on rubygems or any external libraries that aren't included with Ruby; the server application uses very little RAM, approximately 7MB.
+The server application requires Linux kernel 2.6+, will not work in *BSD or OS X; the server application requires only Ruby; it does not rely on rubygems or any external libraries that aren't included with Ruby; the server application uses very little RAM, approximately 7MB.
 
 All the client applications depend on the server application being run to work.
 
