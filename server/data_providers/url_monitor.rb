@@ -9,19 +9,21 @@ class DataProviders::UrlMonitor
     @mutex = Mutex.new
 
     @thread = Thread.new do
-      @settings[:urls].sort.each do |url|
-        duration = -1
-        works = false
-        begin
-          start = Time.now
-          result = Net::HTTP.get(URI.parse(url))
-          duration = Time.now - start
-          works = true
-        rescue Exception => e
+      while(true)
+        @settings[:urls].sort.each do |url|
+          duration = -1
+          works = false
+          begin
+            start = Time.now
+            result = Net::HTTP.get(URI.parse(url))
+            duration = Time.now - start
+            works = true
+          rescue Exception => e
+          end
+          @mutex.synchronize { @readings << [url, { :response_time => duration * 1000, :works => works }] }
         end
-        @mutex.synchronize { @readings << [url, { :response_time => duration * 1000, :works => works }] }
+        sleep(@settings[:update_rate])
       end
-      sleep(@settings[:update_rate])
     end
           
   end
