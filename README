@@ -1,17 +1,29 @@
 Webstats
 ========
 
-Webstats is a server and clients that monitors your servers performance (CPU usage, memory usage, disk usage) and allows you to get notifications on your computer when the server is having problems, as well as showing (http://kimag.es/share/91090734.png) the current performance stats for the server on a web page.
+Webstats is a server and clients that monitors your servers performance (CPU usage, memory usage, disk usage, disk activity, url load time) and allows you to get notifications on your computer when the server is having problems, as well as showing (http://kimag.es/share/91090734.png) the current performance stats for the server on a web page.
 
 Webstats has 2 components: the _server_ and one or more _clients_.
 
 Server
 ------
-The server runs on the computer whose performance you want to monitor; the server application's job is to (1) monitor the computer's performance and (2) report these performance statistics through a webserver that the server app runs.
+The server runs on the computer whose performance you want to monitor; the server application's job is to (1) monitor the computer's performance and (2) report these performance statistics through a webserver that the server application runs.
 
 See Installation below for install instructions.
 
-The server app executes in the background and starts a tiny webserver on port 9970. You can view the performance stats for your server by going to http://<server's hostname>:9970/, for example if my server was under the domain name bloople.net, I would go to http://bloople.net:9970/ to see my performance stats. The statistics on this page automatically update every 5 seconds. You may need to open port 9970 if you have a firewall on your server. Note that the various clients get their data via the webserver the server app runs, just like the built-in stats page.
+The server application executes in the background and starts a tiny webserver on port 9970. You can view the performance stats for your server by going to http://<server's hostname>:9970/, for example if my server was under the domain name bloople.net, I would go to http://bloople.net:9970/. The statistics on this page automatically update every 5 seconds. You may need to open port 9970 if you have a firewall on your server. Note that the various clients get their data via the webserver the server application runs, just like the built-in stats page.
+
+The statistic provided by the server application are:
+
+* CPU usage and load average
+* Memory (RAM) usage, with free, free - buffers, and total counts
+* Disk usage by mount point
+* Disk activity for reads and writes
+* URL monitoring, to load URL's you specify to ensure they work
+
+The server application will warn you of any of these statistics indicate a problem on the server - for example if you've have < 5MB free RAM for the last 12 seconds, that indicates a potential problem on your server that needs looking at. If you're looking at the performance statistics web page, the warnings will be presented by higlighting the perf stat that's causing the warning; when you're using a client application, it will present warnings to you as it sees fit.
+
+You can configure at what thresholds the warnings get generated, as well as the URL's to monitor, by editing ~/.webstats. This file is generated the first time you run webstats, so it's pre-filled with sensible defaults; but you can change them as you see fit.
 
 You can prevent public access to your webstats by invoking the server application with a single argument (e.g. ruby webstats.rb <password>). Then, when you visit the webstats, you'll be prompted for a username and password; the username is always 'webstats', and the password is the password specified just above.
 
@@ -21,7 +33,7 @@ All the client applications depend on the server application being run to work.
 
 Clients
 -------
-If all you want to do is be able to view the performance stats for your server in a web browser, then you don't need to use any of these clients; going to http://<server's hostname>:9970/ will do just fine. But if you want to have Growl or email notification when something goes wrong, without having to look at a web page all the time, then you'll want one of the client applications that come with Webstats.
+If all you want to do is be able to view the performance statistics for your server in a web browser, then you don't need to use any of these clients; going to http://<server's hostname>:9970/ will do just fine. But if you want to have Growl or email notification when something goes wrong, without having to look at a web page all the time, then you'll want one of the client applications that come with Webstats.
 
 Right now there's only one client application available, which is a Growl notifier. The Growl notifier only works on OS X, with RubyCocoa installed. This application runs in the background and monitors the server; if the server goes under high CPU load for more than a few seconds, or if the server is nearly out of memory, you'll get a Growl notification saying what the problem is. This way, you can just set and forget, knowing that Webstats will report any problems.
 
@@ -59,13 +71,9 @@ To run the server app, ssh into the computer you want to monitor. then run:
 
 Todo
 ----
-* (DONE) (Coming soon) Add disk space remaining, with warnings / danger signals.
-* (DONE) (Coming soon) Add optional authentication to server application.
-* (Coming soon) Make webstats configurable.
 * Add email notifier to client applications.
 * More client applications.
 * Extend server to work on *BSD (including OS X).
 * Make webstats server optionally install itself to run at boot.
 * Make client applications optionally install themselves at boot, where suitable.
-* (DONE) Make into a gem?
 * (Maybe) Move all server code into it's own module and make code work without running the web server, so you can use it to just grab stats in your own code.
