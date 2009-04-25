@@ -10,6 +10,8 @@ class DataProviders::UrlMonitor
 
     @thread = Thread.new do
       while(true)
+        @mutex.synchronize { @readings = [] }
+
         @settings[:urls].sort.each do |url|
           duration = -1
           works = false
