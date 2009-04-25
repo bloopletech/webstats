@@ -8,10 +8,10 @@ begin
 
       s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
       s.authors = ["Brenton Fletcher"]
-      s.date = %q{2009-04-22}
+      s.date = Date.today.strftime("%Y-%m-%d")
       s.description = s.summary = %q{Display server CPU/Memory/Disk Usage on a web page, suitable for remote performance monitoring.}
       s.email = %q{i@bloople.net}
-      s.files = Dir['**/*']
+      s.files = Dir['**/*'].reject { |fn| fn =~ /(\.o|\.so|Makefile)$/ }
       s.executables = ['webstats']
       s.extensions = ["server/data_providers/extconf.rb"]
       s.has_rdoc = false
