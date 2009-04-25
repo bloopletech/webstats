@@ -1,5 +1,6 @@
 class DataProviders::DiskUsage
-  def initialize
+  def initialize(settings)
+    @settings = self.class.default_settings.merge(settings)
   end
 
   def get
@@ -16,15 +17,15 @@ class DataProviders::DiskUsage
     out[:mounts].map do |mp|
       mp[1]['free'] /= (1024.0 * 1024)
       mp[1]['total'] /= (1024.0 * 1024)
-      out[:status] = "warning" if mp[1]['free'] < 50 and mp[1]['total'] > 100 and out[:status] != 'danger'
-      out[:status] = "danger" if mp[1]['free'] < 10 and mp[1]['total'] > 20
+      out[:status] = "warning" if mp[1]['free'] < @settings[:warning_threshold] and mp[1]['total'] > @settings[:warning_minimum_mount_point_size] and out[:status] != 'danger'
+      out[:status] = "danger" if mp[1]['free'] < @settings[:danger_threshold] and mp[1]['total'] > @settings[:danger_minimum_mount_point_size]
     end
 
     out
   end
 
   def renderer
-    information.merge({ :name => "Disk Usage by Mount Point", :in_sentence => "Disk Usage", :importance => importance, :contents => %{
+    information.merge({ :contents => %{
 var temp = "";
 for(var i = 0; i < data_source['mounts'].length; i++)
 {
@@ -38,12 +39,12 @@ sc.innerHTML = temp;
 } })
   end
 
-  def information
-    { :name => "Disk Usage by Mount Point", :in_sentence => "Disk Usage", :importance => importance }
+  def self.default_settings
+    { :warning_threshold => 50, :danger_threshold => 10, :warning_minimum_mount_point_size => 100, :danger_minimum_mount_point_size => 20 }
   end
 
-  def importance
-    80
+  def information
+    { :name => "Disk Usage by Mount Point", :in_sentence => "Disk Usage", :importance => 80 }
   end
 
   def kill

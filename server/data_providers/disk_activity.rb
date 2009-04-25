@@ -1,5 +1,7 @@
 class DataProviders::DiskActivity
-  def initialize
+  def initialize(settings)
+    @settings = self.class.default_settings.merge(settings)
+
     @reads_sec = 0
     @writes_sec = 0
 
@@ -20,7 +22,7 @@ class DataProviders::DiskActivity
         last_reads = reads
         last_writes = writes
         last_time = time
-        sleep(2.5)
+        sleep(@settings[:update_rate])
       end
     end
   end
@@ -30,18 +32,18 @@ class DataProviders::DiskActivity
   end
 
   def renderer
-    information.merge({ :name => "Disk Activity", :in_sentence => "Disk Activity", :importance => importance, :contents => %{
+    information.merge({ :contents => %{
 sc.innerHTML = "<div class='major_figure'><span class='title'>Reads</span><span class='figure'>" + data_source['reads'] + "</span><span class='unit'>mb/s</span></div>" +
 "<div class='major_figure'><span class='title'>Writes</span><span class='figure'>" + data_source['writes'] + "</span><span class='unit'>mb/s</span></div>";
 } })
   end
 
-  def information
-    { :name => "Disk Activity", :in_sentence => "Disk Activity", :importance => importance }
+  def self.default_settings
+    { :update_rate => 2.5 }
   end
 
-  def importance
-    70
+  def information
+    { :name => "Disk Activity", :in_sentence => "Disk Activity", :importance => 70 }
   end
 
   def kill

@@ -1,5 +1,7 @@
 class DataProviders::MemInfo
-  def initialize
+  def initialize(settings)
+    @settings = self.class.default_settings.merge(settings)
+
     @readings = []
     @mutex = Mutex.new
 
@@ -13,7 +15,7 @@ class DataProviders::MemInfo
           @readings.unshift(out)
           @readings.pop while @readings.length > 5
         end
-        sleep(2.5)
+        sleep(@settings[:update_rate])
       end
     end
   end
@@ -38,12 +40,12 @@ sc.innerHTML = "<div class='major_figure'><span class='title'>Free</span><span c
 } })
   end
 
-  def information
-    { :name => "Memory Info", :in_sentence => 'Memory Usage', :importance => importance }
+  def self.default_settings
+    { :update_rate => 2.5 }
   end
 
-  def importance
-    90
+  def information
+    { :name => "Memory Info", :in_sentence => 'Memory Usage', :importance => 90 }
   end
 
   def kill

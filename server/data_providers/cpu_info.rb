@@ -1,5 +1,7 @@
 class DataProviders::CpuInfo
-  def initialize
+  def initialize(settings)
+    @settings = self.class.default_settings.merge(settings)
+
     @readings = []
     @mutex = Mutex.new
 
@@ -31,7 +33,7 @@ class DataProviders::CpuInfo
         last_idle = idle
         last_iowait = iowait
         last_time = time
-        sleep(2.5)
+        sleep(@settings[:update_rate])
       end
     end
   end  
@@ -41,8 +43,8 @@ class DataProviders::CpuInfo
     @mutex.synchronize do
       unless @readings.empty?
         out[:usage] = @readings.first
-        out[:status] = 'warning' unless @readings.detect { |r| out[:usage] < 95 }
-        out[:status] = 'danger' unless @readings.detect { |r| out[:usage] < 99.5 }
+        out[:status] = 'warning' unless @readings.detect { |r| out[:usage] < @settings[:usage_warning_level] }
+        out[:status] = 'danger' unless @readings.detect { |r| out[:usage] < @settings[:usage_danger_level] }
       end
     end
     out[:loadavg_1], out[:loadavg_5], out[:loadavg_15] = IO.readlines("/proc/loadavg").first.split(' ', 4).map { |v| v.to_f }
@@ -58,12 +60,12 @@ sc.innerHTML = "<div class='major_figure'><span class='title'>Usage</span><span 
 } })
   end
 
-  def information
-    { :name => "CPU Info", :in_sentence => 'CPU load', :importance => importance }
+  def self.default_settings
+    { :update_rate => 2.5, :usage_warning_level => 95, :usage_danger_level => 99.5 }
   end
 
-  def importance
-    100
+  def information
+    { :name => "CPU Info", :in_sentence => 'CPU load', :importance => 100 }
   end
 
   def kill

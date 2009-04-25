@@ -1,4 +1,5 @@
 require 'webrick'
+require 'yaml'
 
 if $DEBUG
   Thread.abort_on_exception
@@ -12,6 +13,24 @@ Thread.new do
   while(true)
     sleep(300)
     GC.start
+  end
+end
+
+class NilClass
+  def to_json
+    "null"
+  end
+end
+
+class TrueClass
+  def to_json
+    "true"
+  end
+end
+
+class FalseClass
+  def to_json
+    "false"
   end
 end
 
@@ -62,17 +81,39 @@ class Symbol
 end
 
 module DataProviders
+  DATA_SOURCES_CLASSES = {}
   DATA_SOURCES = {}
-  def self.setup
+  def self.preload
     Dir.glob("#{File.dirname(__FILE__)}/data_providers/*.rb").each { |file| load file }
     DataProviders.constants.each do |c|
       c = DataProviders.const_get(c)
-      DATA_SOURCES[c.to_s.gsub(/^DataProviders::/, '').underscore] = c.new if c.is_a? Class
+      DATA_SOURCES_CLASSES[c.to_s.gsub(/^DataProviders::/, '').underscore] = c if c.is_a? Class
     end
+  end
+  def self.setup(settings)
+    DATA_SOURCES_CLASSES.each_pair { |k, v| DATA_SOURCES[k] = v.new(settings[k]) }
   end
 end
 
-DataProviders.setup
+DataProviders.preload
+
+WEBSTATS_PATH = File.expand_path("~/.webstats")
+
+settings = {}
+
+if File.exists?(WEBSTATS_PATH)
+  settings = YAML.load(IO.read(WEBSTATS_PATH))
+else
+  DataProviders::DATA_SOURCES_CLASSES.each_pair do |k, v|
+    settings[k] = v.default_settings
+  end
+
+  File.open(WEBSTATS_PATH, "w") do |f|
+    YAML.dump(settings, f)
+  end
+end
+
+DataProviders.setup(settings)
 
 class Webstats < WEBrick::HTTPServlet::AbstractServlet
   def do_GET(req, res)
@@ -144,7 +185,7 @@ body << <<-EOF
     <div id="main">
       <h1><span>Stats for #{req.host}</span></h1>
 EOF
-      DataProviders::DATA_SOURCES.sort { |a, b| b[1].importance <=> a[1].importance }.each do |(k, v)|
+      DataProviders::DATA_SOURCES.sort { |a, b| b[1].information[:importance] <=> a[1].information[:importance] }.each do |(k, v)|
         r = v.renderer
         body << %{<div class="source" id="source_#{k}"><h2><span>#{r[:name]}</span></h2><div class="source_contents" id="source_contents_#{k}">Loading...</div></div>}
       end
@@ -157,7 +198,7 @@ EOF
     elsif req.path_info == '/update'
       out = {}
       DataProviders::DATA_SOURCES.each_pair do |k, v|
-        out[k] = v.get
+        out[k] = v.get.dup
       end
 
       fix_leaves_hash(out)
@@ -179,9 +220,9 @@ EOF
       if v.is_a? Numeric
         array[i] = v.formatted
       elsif v.is_a? Hash
-        array[i] = fix_leaves_hash(array[i])
+        array[i] = fix_leaves_hash(array[i].dup)
       elsif v.is_a? Array
-        array[i] = fix_leaves_array(array[i])
+        array[i] = fix_leaves_array(array[i].dup)
       end
     end
   end
@@ -191,9 +232,9 @@ EOF
       if v.is_a? Numeric
         hash[k] = v.formatted
       elsif v.is_a? Hash
-        hash[k] = fix_leaves_hash(hash[k])
+        hash[k] = fix_leaves_hash(hash[k].dup)
       elsif v.is_a? Array
-        hash[k] = fix_leaves_array(hash[k])
+        hash[k] = fix_leaves_array(hash[k].dup)
       end
     end
   end
