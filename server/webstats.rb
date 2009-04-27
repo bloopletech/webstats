@@ -84,7 +84,7 @@ module DataProviders
   DATA_SOURCES_CLASSES = {}
   DATA_SOURCES = {}
   def self.preload
-    Dir.glob("#{File.dirname(__FILE__)}/data_providers/*.rb").each { |file| load file }
+    Dir.glob("#{File.dirname(__FILE__)}/data_providers/*.rb").each { |file| load file unless file =~ /extconf.rb$/ }
     DataProviders.constants.each do |c|
       c = DataProviders.const_get(c)
       DATA_SOURCES_CLASSES[c.to_s.gsub(/^DataProviders::/, '').underscore] = c if c.is_a? Class
