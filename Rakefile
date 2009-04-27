@@ -12,7 +12,7 @@ begin
       s.description = s.summary = %q{Display server CPU/Memory/Disk Usage on a web page, suitable for remote performance monitoring.}
       s.email = %q{i@bloople.net}
       s.files = Dir['**/*'].reject { |fn| fn =~ /(\.o|\.so|Makefile|\.gem)$/ }
-      s.executables = ['webstats']
+      s.executables = ['webstats', 'webstats_growl_notifier']
       s.extensions = ["server/data_providers/extconf.rb"]
       s.has_rdoc = false
       s.homepage = %q{http://github.com/bloopletech/webstats}
