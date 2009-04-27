@@ -44,7 +44,7 @@ Otherwise, if you installed webstats manually, run:
 ~$ cd webstats/clients/growl_notifier
 ~/webstats/clients/growl_notifier$ ruby growl_notifier.rb
 
-The first time you run the growl notifier, it will create a configuration file at ~/.webstats_clients; you must edit this file to set the URL's for the growl notifier to monitor. The URL's should the the hostnames of the servers you want to monitor (e.g. bloople.net).
+The first time you run the growl notifier, it will create a configuration file at ~/.webstats_clients; you must edit this file to set the URL's for the growl notifier to monitor. The URL's should the the hostnames of the servers you want to monitor, along with the correct port number (e.g. http://bloople.net:9970/).
 
 Once you've edited the configuration file to add your URL's, run the notifier again; the Growl notifier will then run in the background and notify you od any warnings or danger situations on the server.
 
