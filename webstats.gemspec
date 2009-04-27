@@ -26,7 +26,6 @@ Gem::Specification.new do |s|
     "clients/email_notifier/email_notifier.rb",
     "clients/growl_notifier/Growl.rb",
     "clients/growl_notifier/growl_notifier.rb",
-    "server/data_providers/Makefile",
     "server/data_providers/cpu_info.rb",
     "server/data_providers/disk_activity.rb",
     "server/data_providers/disk_usage.c",
