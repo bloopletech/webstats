@@ -11,7 +11,7 @@ begin
       s.date = Date.today.strftime("%Y-%m-%d")
       s.description = s.summary = %q{Display server CPU/Memory/Disk Usage on a web page, suitable for remote performance monitoring.}
       s.email = %q{i@bloople.net}
-      s.files = Dir['**/*'].reject { |fn| fn =~ /(\.o|\.so|Makefile)$/ }
+      s.files = Dir['**/*'].reject { |fn| fn =~ /(\.o|\.so|Makefile|\.gem)$/ }
       s.executables = ['webstats']
       s.extensions = ["server/data_providers/extconf.rb"]
       s.has_rdoc = false
