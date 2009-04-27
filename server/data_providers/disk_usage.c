@@ -1,5 +1,5 @@
 #include <ruby.h>
-#include <sys/vfs.h>
+#include <sys/statvfs.h>
 
 static VALUE get_disk_usage(VALUE self, VALUE mount_point)
 {
@@ -9,12 +9,12 @@ static VALUE get_disk_usage(VALUE self, VALUE mount_point)
    rb_hash_aset(out_hash, rb_str_new2("free"), Qnil);
    rb_hash_aset(out_hash, rb_str_new2("total"), Qnil);
 
-   struct statfs result;
+   struct statvfs result;
 
-   if(statfs(mount_point_str, &result) == 0)
+   if(statvfs(mount_point_str, &result) == 0)
    {
-      rb_hash_aset(out_hash, rb_str_new2("free"), LL2NUM((long long)result.f_bfree * (long long)result.f_bsize));
-      rb_hash_aset(out_hash, rb_str_new2("total"), LL2NUM((long long)result.f_blocks * (long long)result.f_bsize));
+      rb_hash_aset(out_hash, rb_str_new2("free"), LL2NUM((long long)result.f_bavail * (long long)result.f_frsize));
+      rb_hash_aset(out_hash, rb_str_new2("total"), LL2NUM((long long)result.f_blocks * (long long)result.f_frsize));
    }
 
    return out_hash;
