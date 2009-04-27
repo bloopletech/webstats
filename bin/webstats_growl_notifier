@@ -1,0 +1,1 @@
+require File.dirname(__FILE__) + '/../clients/growl_notifier/growl_notifier'
