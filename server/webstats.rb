@@ -17,21 +17,15 @@ Thread.new do
 end
 
 class NilClass
-  def to_json
-    "null"
-  end
+  def to_json; "null"; end
 end
 
 class TrueClass
-  def to_json
-    "true"
-  end
+  def to_json; "true"; end
 end
 
 class FalseClass
-  def to_json
-    "false"
-  end
+  def to_json; "false"; end
 end
 
 class String
@@ -56,17 +50,46 @@ class Numeric
 end
 
 class Array
+  def formatted!
+    each_with_index do |v, i|
+      if v.is_a? Numeric
+        self[i] = v.formatted
+      elsif v.is_a? Hash or v.is_a? Array
+        self[i] = self[i].dup.formatted!
+      end
+    end
+  end
+
+  def stringify_keys!
+    each_with_index { |v, i| self[i] = self[i].dup.stringify_keys! if v.is_a? Hash }
+  end
+
   def to_json
     "[#{map { |e| e.to_json }.join(',')}]"
   end
 end
 
 class Hash
-  def formatted
-    out = self.dup
-    out.each_pair { |k, v| out[k] = v.formatted }
-    out
+  def formatted!
+    each_pair do |k, v|
+      if v.is_a? Numeric
+        self[k] = v.formatted
+      elsif v.is_a? Hash or v.is_a? Array
+        self[k] = self[k].dup.formatted!
+      end
+    end
   end
+  
+  def stringify_keys!
+    keys.each { |key| self[key.to_s] = delete(key) }
+    each_pair { |k, v| self[k] = self[k].dup.stringify_keys! if v.is_a? Hash }
+  end
+
+  alias_method :undecorated_get, :[]
+  def [](key)
+    undecorated_get(key) or undecorated_get(key.is_a?(String) ? key.to_sym : key.to_s)
+  end
+
   def to_json
     arr = []
     each_pair { |k, v| arr << "#{k.to_json}:#{v.to_json}" }
@@ -99,25 +122,21 @@ DataProviders.preload
 
 WEBSTATS_PATH = File.expand_path("~/.webstats")
 
-settings = {}
+$settings = {}
 
 if File.exists?(WEBSTATS_PATH)
-  settings = YAML.load(IO.read(WEBSTATS_PATH))
+  $settings = YAML.load(IO.read(WEBSTATS_PATH))
 else
-  DataProviders::DATA_SOURCES_CLASSES.each_pair do |k, v|
-    settings[k] = v.default_settings
-  end
-
-  File.open(WEBSTATS_PATH, "w") do |f|
-    YAML.dump(settings, f)
-  end
+  $settings['webstats'] = { 'password' => nil }
+  DataProviders::DATA_SOURCES_CLASSES.each_pair { |k, v| $settings[k.to_s] = v.default_settings.stringify_keys! }
+  File.open(WEBSTATS_PATH, "w") { |f| YAML.dump($settings, f) }
 end
 
-DataProviders.setup(settings)
+DataProviders.setup($settings)
 
 class Webstats < WEBrick::HTTPServlet::AbstractServlet
   def do_GET(req, res)
-    WEBrick::HTTPAuth.basic_auth(req, res, "Webstats") { |user, pass| user == 'webstats' and pass == ARGV[0] } unless ARGV.empty?
+    WEBrick::HTTPAuth.basic_auth(req, res, "Webstats") { |u, p| u == 'webstats' and p == $settings[:webstats][:password] } unless $settings[:webstats][:password].nil?
 
     body = ""
     if req.path_info == '/'
@@ -201,7 +220,7 @@ EOF
         out[k] = v.get.dup
       end
 
-      fix_leaves_hash(out)
+      out.formatted!
 
       body << out.to_json
     elsif req.path_info == '/information'
@@ -212,31 +231,6 @@ EOF
 
     res.body = body
     res['Content-Type'] = "text/html"
-  end
-
-  private
-  def fix_leaves_array(array)
-    array.each_with_index do |v, i|
-      if v.is_a? Numeric
-        array[i] = v.formatted
-      elsif v.is_a? Hash
-        array[i] = fix_leaves_hash(array[i].dup)
-      elsif v.is_a? Array
-        array[i] = fix_leaves_array(array[i].dup)
-      end
-    end
-  end
-
-  def fix_leaves_hash(hash)
-    hash.each_pair do |k, v|
-      if v.is_a? Numeric
-        hash[k] = v.formatted
-      elsif v.is_a? Hash
-        hash[k] = fix_leaves_hash(hash[k].dup)
-      elsif v.is_a? Array
-        hash[k] = fix_leaves_array(hash[k].dup)
-      end
-    end
   end
 end
 
