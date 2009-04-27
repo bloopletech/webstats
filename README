@@ -37,12 +37,16 @@ If all you want to do is be able to view the performance statistics for your ser
 
 Right now there's only one client application available, which is a Growl notifier. The Growl notifier only works on OS X, with RubyCocoa installed. This application runs in the background and monitors the server; if the server goes under high CPU load for more than a few seconds, or if the server is nearly out of memory, you'll get a Growl notification saying what the problem is. This way, you can just set and forget, knowing that Webstats will report any problems.
 
-To run the Growl notifier, open a terminal on your computer, then run (the first line is only needed the first time you run the notifier):
-~$ git clone git://github.com/bloopletech/webstats.git
-~$ cd webstats/clients/growl_notifier
-~/webstats/clients/growl_notifier$ ruby growl_notifier.rb http://<server's hostname>:9970/
+To run the Growl notifier, first install Webstats on your local machine, using the installation instructions below (Skip the step that starts the server application). Then, if you installed webstats locally via rubygems, run:
+~$ webstats_growl_notifier
 
-Where server's hostname is the host name of the server you want to monitor (e.g. bloople.net). The Growl notifier will then run in the background.
+Otherwise, if you installed webstats manually, run:
+~$ cd webstats/clients/growl_notifier
+~/webstats/clients/growl_notifier$ ruby growl_notifier.rb
+
+The first time you run the growl notifier, it will create a configuration file at ~/.webstats_clients; you must edit this file to set the URL's for the growl notifier to monitor. The URL's should the the hostnames of the servers you want to monitor (e.g. bloople.net).
+
+Once you've edited the configuration file to add your URL's, run the notifier again; the Growl notifier will then run in the background and notify you od any warnings or danger situations on the server.
 
 Installation
 ------------
@@ -54,8 +58,6 @@ To run the server application, run:
 ~$ webstats
 
 The server application will start in the background.
-
-Coming soon: growl notifier client via rubygems.
 
 If you don't want to use rubygems, then follow the below instructions:
 To install the server app, ssh into the computer you want to monitor. then run:
