@@ -12,14 +12,14 @@ class DataProviders::UrlMonitor
       while(true)
         @settings[:urls].sort.each do |url|
           @mutex.synchronize { @readings[url] = { :response_time => -1, :works => (@readings.key?(url) && @readings[url][:works] == :failed ? :failed : :waiting) } }
-          duration = -1
+          duration = 0
           works = :failed
           begin
             uri = URI.parse(url)
             start = Time.now
-            Net::HTTP.start(uri.host) { |http|
-              http.read_timeout = http.open_timeout = @settings[:danger_response_time_threshold] * 1000
-              raise Exception unless http.get(uri.path).code.include?(200, 201, 202, 203, 204, 205, 206, 301, 302, 304)
+            Net::HTTP.start(uri.host, uri.port) { |http|
+              http.read_timeout = http.open_timeout = @settings[:danger_response_time_threshold]
+              raise Exception unless [200, 201, 202, 203, 204, 205, 206, 301, 302, 304].include? http.get(uri.path).code.to_i
             }
 
             duration = Time.now - start
@@ -59,7 +59,7 @@ sc.innerHTML = temp;
   end
 
   def self.default_settings
-    { :update_rate => 30, :warning_response_time_threshold => 5000, :danger_response_time_threshold => 15000, :urls => ['http://localhost/'] }
+    { :update_rate => 30, :warning_response_time_threshold => 5, :danger_response_time_threshold => 15, :urls => ['http://localhost/'] }
   end
 
   def information
