@@ -1,4 +1,4 @@
-if $DEBUG
+if true or $DEBUG
   Thread.abort_on_exception
 else
   exit if fork
@@ -13,26 +13,26 @@ require 'uri'
 require File.dirname(__FILE__) + '/Growl.rb'
 
 require File.dirname(__FILE__) + '/../common'
-load_settings('growl_notifier', { 'urls' => [{ 'url' => '', 'password' => nil }] })
+load_settings('growl_notifier', { 'urls' => [{ 'url' => '', 'password' => nil }] }, "Please edit ~/.webstats_clients and add some URLs to monitor")
 
-def make_request(url, password)
-  req = Net::HTTP::Get.new(url.request_uri)
-  req.basic_auth 'webstats', password unless password.nil?
-  JSON.parse(Net::HTTP.new(url.host, url.port).start { |http| http.request(req).body })
-end
-
-urls = $settings[:growl_notifier][:urls]
+urls = $settings[:urls]
 
 g = GrowlNotifier.new("Webstats", ['Webstats Notification'], nil, OSX::NSWorkspace.sharedWorkspace().iconForFileType_('unknown'))
 g.register
 
+failed_url = lambda do |url, password, exception|
+  g.notify "Webstats Notification", "Cannot load Webstats data", "Could not load #{url}#{!password.nil? ? " with password #{password}" : ""}, error was #{exception.message}. Will try again in 60 seconds."
+  sleep(60)
+  true
+end
+
 urls.each do |url|
-  url.merge!({ :meta_info => make_request(URI.join(url[:url], "information"), url[:password]), :last_warnings_text => nil, :last_danger_text => nil, :last_time => 0 })
+  url.merge!({ :meta_info => make_request(URI.join(url[:url], "information"), url[:password], failed_url), :last_warnings_text => nil, :last_danger_text => nil, :last_time => 0 })
 end
 
 while(true)
   urls.each do |url|
-    data = make_request(URI.join(url[:url], "update"), url[:password])
+    data = make_request(URI.join(url[:url], "update"), url[:password], failed_url)
 
     bad = data.sort { |a, b| b[1]['importance'].to_f <=> a[1]['importance'].to_f }.select { |(k, v)| !v['status'].nil? && v['status'] != '' }
 
