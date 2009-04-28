@@ -38,8 +38,8 @@ class DataProviders::UrlMonitor
     out = {}
     @mutex.synchronize { out[:urls] = @readings.to_a.sort_by { |e| e[0] } }
     out[:urls].each do |(url, info)|
-      out[:status] = 'warning' if (info[:works] == :failed) or info[:response_time] > @settings[:warning_response_time_threshold] and !out[:status] == 'danger'
-      out[:status] = 'danger' if (info[:works] == :failed) or info[:response_time] > @settings[:danger_response_time_threshold]
+      out[:status] = 'warning' if (info[:works] == :failed) or info[:response_time] > @settings[:warning_response_time_threshold] * 1000 and !out[:status] == 'danger'
+      out[:status] = 'danger' if (info[:works] == :failed) or info[:response_time] > @settings[:danger_response_time_threshold] * 1000
     end
     out
   end
