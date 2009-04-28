@@ -60,6 +60,10 @@ class Array
     end
   end
 
+  def symbolize_keys!
+    each_with_index { |v, i| self[i] = self[i].dup.symbolize_keys! if v.is_a? Hash }
+  end
+
   def stringify_keys!
     each_with_index { |v, i| self[i] = self[i].dup.stringify_keys! if v.is_a? Hash }
   end
@@ -80,6 +84,11 @@ class Hash
     end
   end
   
+  def symbolize_keys!
+    keys.each { |key| self[key.to_sym] = delete(key) }
+    each_pair { |k, v| self[k] = self[k].dup.symbolize_keys! if v.is_a? Hash }
+  end
+
   def stringify_keys!
     keys.each { |key| self[key.to_s] = delete(key) }
     each_pair { |k, v| self[k] = self[k].dup.stringify_keys! if v.is_a? Hash }
@@ -125,7 +134,7 @@ WEBSTATS_PATH = File.expand_path("~/.webstats")
 $settings = {}
 
 if File.exists?(WEBSTATS_PATH)
-  $settings = YAML.load(IO.read(WEBSTATS_PATH))
+  $settings = YAML.load(IO.read(WEBSTATS_PATH)).symbolize_keys!
 else
   $settings['webstats'] = { 'password' => nil }
   DataProviders::DATA_SOURCES_CLASSES.each_pair { |k, v| $settings[k.to_s] = v.default_settings.stringify_keys! }

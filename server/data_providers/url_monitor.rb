@@ -4,14 +4,12 @@ class DataProviders::UrlMonitor
   def initialize(settings)
     @settings = self.class.default_settings.merge(settings)
 
-    @readings = []
+    @readings = {}
 
     @mutex = Mutex.new
 
     @thread = Thread.new do
       while(true)
-        @mutex.synchronize { @readings = [] }
-
         @settings[:urls].sort.each do |url|
           duration = -1
           works = false
@@ -22,7 +20,7 @@ class DataProviders::UrlMonitor
             works = true
           rescue Exception => e
           end
-          @mutex.synchronize { @readings << [url, { :response_time => duration * 1000, :works => works }] }
+          @mutex.synchronize { @readings[url] = { :response_time => duration * 1000, :works => works } }
         end
         sleep(@settings[:update_rate])
       end
@@ -32,7 +30,7 @@ class DataProviders::UrlMonitor
 
   def get
     out = {}
-    @mutex.synchronize { out[:urls] = @readings }
+    @mutex.synchronize { out[:urls] = @readings.to_a.sort_by { |e| e[0] } }
     out[:urls].each do |(url, info)|
       out[:status] = 'warning' if !info[:works] or info[:response_time] > @settings[:warning_response_time_threshold] and !out[:status] == 'danger'
       out[:status] = 'danger' if !info[:works] or info[:response_time] > @settings[:danger_response_time_threshold]
@@ -55,7 +53,7 @@ sc.innerHTML = temp;
   end
 
   def self.default_settings
-    { :update_rate => 30, :warning_response_time_threshold => 5000, :danger_response_time_threshold => 30000, :urls => ['http://localhost/'] }
+    { :update_rate => 30, :warning_response_time_threshold => 5000, :danger_response_time_threshold => 15000, :urls => ['http://localhost/'] }
   end
 
   def information
