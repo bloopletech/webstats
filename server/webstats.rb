@@ -4,7 +4,11 @@ require 'yaml'
 if $DEBUG
   Thread.abort_on_exception
 else
-  exit if fork
+  if (pid = fork)
+    Signal.trap('HUP', 'IGNORE')
+    Process.detach(pid)
+    exit
+  end
   $stdout = File.new('/dev/null', 'w')
   $stderr = File.new('/dev/null', 'w')
 end
@@ -194,6 +198,7 @@ class Webstats < WEBrick::HTTPServlet::AbstractServlet
             {
                var results = eval("(" + http.responseText + ")");
                if(!results) return;
+                 console.log('procing');
 EOF
 
       DataProviders::DATA_SOURCES.each_pair do |k, v|
