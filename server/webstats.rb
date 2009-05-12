@@ -9,8 +9,8 @@ else
     Process.detach(pid)
     exit
   end
-  $stdout = File.new('/dev/null', 'w')
-  $stderr = File.new('/dev/null', 'w')
+  #$stdout = File.new('/dev/null', 'w')
+  #$stderr = File.new('/dev/null', 'w')
 end
 
 Thread.new do
@@ -73,7 +73,7 @@ class Array
   end
 
   def to_json
-    "[#{map { |e| e.to_json }.join(',')}]"
+    "[#{map { |e| e.to_json }.join(', ')}]"
   end
 end
 
@@ -98,15 +98,15 @@ class Hash
     each_pair { |k, v| self[k] = self[k].dup.stringify_keys! if v.is_a? Hash }
   end
 
-  alias_method :undecorated_get, :[]
+  alias_method :undecorated_get, :[] unless method_defined?(:undecorated_get)
   def [](key)
     undecorated_get(key) or undecorated_get(key.is_a?(String) ? key.to_sym : key.to_s)
   end
 
   def to_json
     arr = []
-    each_pair { |k, v| arr << "#{k.to_json}:#{v.to_json}" }
-    "{#{arr.join(',')}}"
+    each_pair { |k, v| arr << "#{k.to_json}: #{v.to_json}" }
+    "{#{arr.join(', ')}}"
   end
 end
 
@@ -140,7 +140,7 @@ $settings = {}
 if File.exists?(WEBSTATS_PATH)
   $settings = YAML.load(IO.read(WEBSTATS_PATH)).symbolize_keys!
 else
-  $settings['webstats'] = { 'password' => nil }
+  $settings['webstats'] = { 'password' => nil, :clients => [] }
   DataProviders::DATA_SOURCES_CLASSES.each_pair { |k, v| $settings[k.to_s] = v.default_settings.stringify_keys! }
   File.open(WEBSTATS_PATH, "w") { |f| YAML.dump($settings, f) }
 end
@@ -198,7 +198,6 @@ class Webstats < WEBrick::HTTPServlet::AbstractServlet
             {
                var results = eval("(" + http.responseText + ")");
                if(!results) return;
-                 console.log('procing');
 EOF
 
       DataProviders::DATA_SOURCES.each_pair do |k, v|
@@ -248,14 +247,24 @@ EOF
   end
 end
 
-s = WEBrick::HTTPServer.new(:Port => 9970)
+threads = []
+
+s = WEBrick::HTTPServer.new(:Port => 9970, :Logger => WEBrick::Log.new(nil, 0), :AccessLog => WEBrick::Log.new(nil, 0))
 
 death = proc do
   s.shutdown
   DataProviders::DATA_SOURCES.each_pair { |k, v| v.kill }
+  threads.each { |t| t.kill }
 end
 trap("INT", death)
 trap("TERM", death)
 
 s.mount("/", Webstats)
-s.start
+threads << Thread.new { s.start }
+
+if $settings['webstats'].key?(:clients) and !$settings['webstats'][:clients].nil?
+  $DAEMONIZE = false
+  $settings['webstats'][:clients].each { |name| threads << Thread.new { require "#{File.dirname(__FILE__)}/../clients/#{name}/#{name}.rb" } }
+end
+
+threads.first.join
