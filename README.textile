@@ -40,8 +40,7 @@ To run the Growl notifier, first install Webstats on your local machine, using t
 <pre><code>~$ webstats_growl_notifier</code></pre>
 
 Otherwise, if you installed webstats manually, run:
-<pre><code>
-~$ cd webstats/clients/growl_notifier
+<pre><code>~$ cd webstats/clients/growl_notifier
 ~/webstats/clients/growl_notifier$ ruby growl_notifier.rb
 </code></pre>
 
@@ -61,8 +60,7 @@ The server application will start in the background.
 
 If you don't want to use rubygems, then follow the below instructions:
 To install the server app, ssh into the computer you want to monitor. then run:
-<pre><code>
-~$ git clone git://github.com/bloopletech/webstats.git
+<pre><code>~$ git clone git://github.com/bloopletech/webstats.git
 ~$ cd webstats
 ~/webstats$ cd server/data_providers
 ~/webstats/server/data_providers$ ruby extconf.rb
@@ -70,8 +68,7 @@ To install the server app, ssh into the computer you want to monitor. then run:
 </code></pre>
 
 To run the server app, ssh into the computer you want to monitor. then run:
-<code><pre>
-~$ cd webstats
+<code><pre>~$ cd webstats
 ~/webstats$ ruby server/webstats.rb
 </pre></code>
 
