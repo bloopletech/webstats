@@ -11,10 +11,19 @@ class EmailNotifier < SimpleNotifier
 
   private
   def send_mail(subject, message)
-    @settings[:recipent] 
-    system("sendmail -oi", "-f", @settings[:recipent])
-    puts subject
-    puts message
+    sm = @settings[:mail_server]
+
+    msg = <<END_OF_MESSAGE
+From: Webstats Email Notifier <#{@settings[:recipient]}>
+To: #{@settings[:recipient]} <#{@settings[:recipient]}>
+Subject: #{subject}
+Date: #{Time.now.rfc2822}
+Message-Id: <#{Time.now.to_i}.#{rand(10000000)}@#{sm[:domain]}>
+
+#{message}
+END_OF_MESSAGE
+
+    Net::SMTP.start(sm[:address], sm[:port], sm[:domain], sm[:username], sm[:password], sm[:authentication]) { |smtp| smtp.send_message msg, @settings[:recipient], @settings[:recipient] }
   end
 
   def failed_url(url, password, exception)

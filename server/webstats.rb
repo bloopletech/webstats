@@ -1,3 +1,4 @@
+#NO GEM DEPENDENCIES FTW
 require 'webrick'
 require 'yaml'
 
@@ -9,8 +10,6 @@ else
     Process.detach(pid)
     exit
   end
-  #$stdout = File.new('/dev/null', 'w')
-  #$stderr = File.new('/dev/null', 'w')
 end
 
 Thread.new do
@@ -140,7 +139,7 @@ $settings = {}
 if File.exists?(WEBSTATS_PATH)
   $settings = YAML.load(IO.read(WEBSTATS_PATH)).symbolize_keys!
 else
-  $settings['webstats'] = { 'password' => nil, :clients => [] }
+  $settings['webstats'] = { 'password' => nil, 'clients' => [] }
   DataProviders::DATA_SOURCES_CLASSES.each_pair { |k, v| $settings[k.to_s] = v.default_settings.stringify_keys! }
   File.open(WEBSTATS_PATH, "w") { |f| YAML.dump($settings, f) }
 end

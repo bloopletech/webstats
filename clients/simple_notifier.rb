@@ -1,6 +1,9 @@
 require 'yaml'
 require 'net/http'
 require 'uri'
+require 'thread'
+require 'time'
+require 'net/smtp'
 
 def daemonize!
   return if $DAEMONIZE == false
@@ -64,7 +67,6 @@ class SimpleNotifier
       @settings[:urls].each do |url|
         threads << Thread.new do
           url[:mutex].synchronize do
-            puts "requesting for #{url[:url]}"
             url[:data] = make_request(URI.join(url[:url], "update"), url[:password])
             url[:bad] = url[:data].sort { |a, b| b[1]['importance'].to_f <=> a[1]['importance'].to_f }.select { |(k, v)| !v['status'].nil? && v['status'] != '' }
             url[:last_warnings] = url[:warnings] || []
@@ -76,7 +78,6 @@ class SimpleNotifier
             url[:changed] = (!url[:warnings].empty? || !url[:dangers].empty?) && (!url.key?(:changed) or (url[:warnings].length > url[:last_warnings].length) or (url[:dangers].length > url[:last_dangers].length))
             url[:time_past] = url[:last_time] != 0 && (Time.now - url[:last_time]) > 60
             url[:last_time] = Time.now if url[:changed] || url[:last_time].nil? || url[:time_past]
-            puts "done for #{url[:url]}"
           end
         end
       end
