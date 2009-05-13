@@ -59,15 +59,21 @@ The server application will start in the background.
 
 If you don't want to use rubygems, then follow the below instructions:
 To install the server app, ssh into the computer you want to monitor. then run:
+<pre>
+<code>
 ~$ git clone git://github.com/bloopletech/webstats.git
 ~$ cd webstats
 ~/webstats$ cd server/data_providers
 ~/webstats/server/data_providers$ ruby extconf.rb
 ~/webstats/server/data_providers$ make
+</code>
+</pre>
 
 To run the server app, ssh into the computer you want to monitor. then run:
+<code><pre>
 ~$ cd webstats
 ~/webstats$ ruby server/webstats.rb
+</pre></code>
 
 h2. Todo
 
