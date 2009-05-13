@@ -6,7 +6,7 @@ class EmailNotifier < SimpleNotifier
     @name = 'email_notifier'
     @no_settings_message = "Please edit ~/.webstats_clients and add some URLs to monitor and an email address to notfiy on"
     
-    super(settings, read_config)
+    super({ 'recipient' => '', 'mail_server' => { 'address' => 'localhost', 'domain' => 'localhost', 'port' => 25 } }.merge(settings), read_config)
   end
 
   private

@@ -1,0 +1,13 @@
+h1. Email notifier for Webstats
+
+The email notifier montiros one or more servers and emails you whenever the server is in danger or could be in danger soon - for example, running out of hard drive space.
+
+h2. Usage
+
+Run the notifier by running webstats_email_notifier or ruby <webstats_install_dir>/clients/email_notifier/email_notifier.rb on the terminal.
+
+It'll create a template of the settings you'll need to change in ~/.webstats_client - you'll need to set the recipient address for the emails, you may need to change the mail server settings - you can supply these settings: address, port, domain, username, password, authentication (one of :plain, :login, or :cram_md5).
+
+You'll also need to add some URL's for the email notifier to monitor - these are the URL's who statistics will be monitored. You will be notified when there is a warning or danger situation for a URL, as well as if one of the URL's can not be loaded. The URL's should the the hostnames of the servers you want to monitor, along with the correct port number (e.g. http://bloople.net:9970/).
+
+Once that's done, run the notifier again and it will begin monitoring.

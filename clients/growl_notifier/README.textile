@@ -1,0 +1,13 @@
+h1. Growl notifer for Webstats
+
+The Growl notifier runs in the background and monitors the server; if the server goes under high CPU load for more than a few seconds, or if the server is nearly out of memory, you'll get a Growl notification saying what the problem is. This way, you can just set and forget, knowing that Webstats will report any problems.
+
+Thy works on OS X only, with RubyCocoa installed. 
+
+.h2 Usage
+
+Run the notifier by running webstats_growl_notifier or ruby <webstats_install_dir>/clients/growl_notifier/growl_notifier.rb on the terminal.
+
+The first time you run the growl notifier, it will create a template of the settings you need to edit at ~/.webstats_clients; you must edit this file to set the URL's for the growl notifier to monitor. The URL's should the the hostnames of the servers you want to monitor, along with the correct port number (e.g. http://bloople.net:9970/).
+
+Once you've edited the configuration file to add your URL's, run the notifier again; the Growl notifier will then run in the background and notify you od any warnings or danger situations on the server.

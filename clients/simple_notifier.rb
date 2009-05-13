@@ -41,7 +41,7 @@ class SimpleNotifier
       end
     
       unless @settings.key?(@name)
-        @settings[@name] = { 'urls' => [{ 'url' => '', 'password' => nil }] }.merge(@default_settings).merge(settings)
+        @settings[@name] = { 'urls' => [{ 'url' => 'http://localhost:9970/', 'password' => nil }] }.merge(@default_settings).merge(settings)
         File.open(config_file_path, "w") { |f| YAML.dump(@settings, f) }
 
         puts @no_settings_message

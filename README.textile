@@ -34,19 +34,18 @@ h2. Clients
 
 If all you want to do is be able to view the performance statistics for your server in a web browser, then you don't need to use any of these clients; going to http://<server's hostname>:9970/ will do just fine. But if you want to have Growl or email notification when something goes wrong, without having to look at a web page all the time, then you'll want one of the client applications that come with Webstats.
 
-Right now there's only one client application available, which is a Growl notifier. The Growl notifier only works on OS X, with RubyCocoa installed. This application runs in the background and monitors the server; if the server goes under high CPU load for more than a few seconds, or if the server is nearly out of memory, you'll get a Growl notification saying what the problem is. This way, you can just set and forget, knowing that Webstats will report any problems.
+There are currently two client applications available:
 
-To run the Growl notifier, first install Webstats on your local machine, using the installation instructions below (Skip the step that starts the server application). Then, if you installed webstats locally via rubygems, run:
-<pre><code>~$ webstats_growl_notifier</code></pre>
+* An email notifier; documentation is available in clients/email_notifier/README.textile
+* A Growl notifier; documentation is available in clients/growl_notifier/README.textile
 
-Otherwise, if you installed webstats manually, run:
-<pre><code>~$ cd webstats/clients/growl_notifier
-~/webstats/clients/growl_notifier$ ruby growl_notifier.rb
-</code></pre>
+The notifiers that ship with Webstats can be started in 2 ways; if you have installed webstats via rubygems, run:
+<pre><code>~$ webstats_<notifier_name></code></pre>
 
-The first time you run the growl notifier, it will create a configuration file at ~/.webstats_clients; you must edit this file to set the URL's for the growl notifier to monitor. The URL's should the the hostnames of the servers you want to monitor, along with the correct port number (e.g. http://bloople.net:9970/).
+For example, to run the email notifier, you can run webstats_email_notifier. If you installed webstats outside of rubygems, first change directory into the directory containing webstats, then run:
+<pre><code>~/webstats$ ruby clients/<notifier_name>/<notifier_name>.rb</code></pre>
 
-Once you've edited the configuration file to add your URL's, run the notifier again; the Growl notifier will then run in the background and notify you od any warnings or danger situations on the server.
+Many notifiers can also be run on the server, in the same ruby process as teh webstats server itself. To do this, change any settings as required by the documentation for the notifier, then add the notifier name (e.g. email_notifier) to the list of clients under webstats > clients in the ~/.webstats file
 
 h2. Installation
 
