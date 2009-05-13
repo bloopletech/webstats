@@ -10,7 +10,7 @@ The server runs on the computer whose performance you want to monitor; the serve
 
 See Installation below for install instructions.
 
-The server application executes in the background and starts a tiny webserver on port 9970. You can view the performance stats for your server by going to http://<server's hostname>:9970/, for example if my server was under the domain name bloople.net, I would go to http://bloople.net:9970/. The statistics on this page automatically update every 5 seconds. You may need to open port 9970 if you have a firewall on your server. Note that the various clients get their data via the webserver the server application runs, just like the built-in stats page.
+The server application executes in the background and starts a tiny webserver on port 9970. You can view the performance stats for your server by going to http://&lt;server's hostname&gt;:9970/, for example if my server was under the domain name bloople.net, I would go to http://bloople.net:9970/. The statistics on this page automatically update every 5 seconds. You may need to open port 9970 if you have a firewall on your server. Note that the various clients get their data via the webserver the server application runs, just like the built-in stats page.
 
 The statistic provided by the server application are:
 
