@@ -37,11 +37,13 @@ If all you want to do is be able to view the performance statistics for your ser
 Right now there's only one client application available, which is a Growl notifier. The Growl notifier only works on OS X, with RubyCocoa installed. This application runs in the background and monitors the server; if the server goes under high CPU load for more than a few seconds, or if the server is nearly out of memory, you'll get a Growl notification saying what the problem is. This way, you can just set and forget, knowing that Webstats will report any problems.
 
 To run the Growl notifier, first install Webstats on your local machine, using the installation instructions below (Skip the step that starts the server application). Then, if you installed webstats locally via rubygems, run:
-~$ webstats_growl_notifier
+<pre><code>~$ webstats_growl_notifier</code></pre>
 
 Otherwise, if you installed webstats manually, run:
+<pre><code>
 ~$ cd webstats/clients/growl_notifier
 ~/webstats/clients/growl_notifier$ ruby growl_notifier.rb
+</code></pre>
 
 The first time you run the growl notifier, it will create a configuration file at ~/.webstats_clients; you must edit this file to set the URL's for the growl notifier to monitor. The URL's should the the hostnames of the servers you want to monitor, along with the correct port number (e.g. http://bloople.net:9970/).
 
@@ -50,24 +52,22 @@ Once you've edited the configuration file to add your URL's, run the notifier ag
 h2. Installation
 
 You can now install webstats using rubygems; this saves you a bit of hassle. To install webstats on the server via rubygems, ensure github gems are in your gems sources; then run:
-~$ sudo gem install bloopletech-webstats
+<pre><code>~$ sudo gem install bloopletech-webstats</code></pre>
 
 To run the server application, run:
-~$ webstats
+<pre><code>~$ webstats</code></pre>
 
 The server application will start in the background.
 
 If you don't want to use rubygems, then follow the below instructions:
 To install the server app, ssh into the computer you want to monitor. then run:
-<pre>
-<code>
+<pre><code>
 ~$ git clone git://github.com/bloopletech/webstats.git
 ~$ cd webstats
 ~/webstats$ cd server/data_providers
 ~/webstats/server/data_providers$ ruby extconf.rb
 ~/webstats/server/data_providers$ make
-</code>
-</pre>
+</code></pre>
 
 To run the server app, ssh into the computer you want to monitor. then run:
 <code><pre>
