@@ -2,30 +2,32 @@
 
 Gem::Specification.new do |s|
   s.name = %q{webstats}
-  s.version = "0.9.0"
+  s.version = "0.10.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Brenton Fletcher"]
-  s.date = %q{2009-05-06}
+  s.date = %q{2009-05-14}
   s.description = %q{Monitor server CPU/Memory/Disk Usage/URL Loading, so that you can view those statistics on a web page, as well as providing an interface to client prorams to read those statistics.}
   s.email = %q{i@bloople.net}
   s.executables = ["webstats", "webstats_growl_notifier"]
   s.extensions = ["server/data_providers/extconf.rb"]
   s.extra_rdoc_files = [
     "LICENSE",
-    "README"
+    "README.textile"
   ]
   s.files = [
     "LICENSE",
-    "README",
+    "README.textile",
     "Rakefile",
     "VERSION.yml",
     "bin/webstats",
     "bin/webstats_growl_notifier",
-    "clients/common.rb",
+    "clients/email_notifier/README.textile",
     "clients/email_notifier/email_notifier.rb",
     "clients/growl_notifier/Growl.rb",
+    "clients/growl_notifier/README.textile",
     "clients/growl_notifier/growl_notifier.rb",
+    "clients/simple_notifier.rb",
     "server/data_providers/cpu_info.rb",
     "server/data_providers/disk_activity.rb",
     "server/data_providers/disk_usage.c",
