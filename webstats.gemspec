@@ -2,7 +2,7 @@
 
 Gem::Specification.new do |s|
   s.name = %q{webstats}
-  s.version = "0.10.3"
+  s.version = "0.10.4"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Brenton Fletcher"]
@@ -23,7 +23,6 @@ Gem::Specification.new do |s|
     "bin/webstats",
     "bin/webstats_email_notifier",
     "bin/webstats_growl_notifier",
-    "bloople@bloople.net",
     "clients/email_notifier/README.textile",
     "clients/email_notifier/email_notifier.rb",
     "clients/growl_notifier/Growl.rb",
