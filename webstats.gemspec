@@ -2,11 +2,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{webstats}
-  s.version = "0.10.1"
+  s.version = "0.10.2"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Brenton Fletcher"]
-  s.date = %q{2009-05-14}
+  s.date = %q{2009-05-15}
   s.description = %q{Monitor server CPU/Memory/Disk Usage/URL Loading, so that you can view those statistics on a web page, as well as providing an interface to client prorams to read those statistics.}
   s.email = %q{i@bloople.net}
   s.executables = ["webstats", "webstats_growl_notifier"]
@@ -21,6 +21,7 @@ Gem::Specification.new do |s|
     "Rakefile",
     "VERSION.yml",
     "bin/webstats",
+    "bin/webstats_email_notifier",
     "bin/webstats_growl_notifier",
     "clients/email_notifier/README.textile",
     "clients/email_notifier/email_notifier.rb",
