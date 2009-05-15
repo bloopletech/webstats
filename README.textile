@@ -40,6 +40,7 @@ There are currently two client applications available:
 * A Growl notifier; documentation is available in clients/growl_notifier/README.textile
 
 The notifiers that ship with Webstats can be started in 2 ways; if you have installed webstats via rubygems, run:
+
 <pre><code>~$ webstats_<notifier_name></code></pre>
 
 For example, to run the email notifier, you can run webstats_email_notifier. If you installed webstats outside of rubygems, first change directory into the directory containing webstats, then run:
