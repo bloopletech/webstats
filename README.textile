@@ -32,7 +32,7 @@ All the client applications depend on the server application being run to work.
 
 h2. Clients
 
-If all you want to do is be able to view the performance statistics for your server in a web browser, then you don't need to use any of these clients; going to http://<server's hostname>:9970/ will do just fine. But if you want to have Growl or email notification when something goes wrong, without having to look at a web page all the time, then you'll want one of the client applications that come with Webstats.
+If all you want to do is be able to view the performance statistics for your server in a web browser, then you don't need to use any of these clients; going to http://&lt;server's hostname&gt;:9970/ will do just fine. But if you want to have Growl or email notification when something goes wrong, without having to look at a web page all the time, then you'll want one of the client applications that come with Webstats.
 
 There are currently two client applications available:
 
