@@ -73,7 +73,6 @@ To run the server app, ssh into the computer you want to monitor. then run:
 
 h2. Todo
 
-* Add email notifier to client applications.
 * More client applications.
 * Extend server to work on *BSD (including OS X).
 * Make webstats server optionally install itself to run at boot.
