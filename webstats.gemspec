@@ -2,11 +2,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{webstats}
-  s.version = "0.10.4"
+  s.version = "0.10.5"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Brenton Fletcher"]
-  s.date = %q{2009-05-15}
+  s.date = %q{2009-06-27}
   s.description = %q{Monitor server CPU/Memory/Disk Usage/URL Loading, so that you can view those statistics on a web page, as well as providing an interface to client prorams to read those statistics.}
   s.email = %q{i@bloople.net}
   s.executables = ["webstats", "webstats_growl_notifier", "webstats_email_notifier"]
