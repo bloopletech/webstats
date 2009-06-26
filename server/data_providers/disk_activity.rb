@@ -11,7 +11,7 @@ class DataProviders::DiskActivity
       while(true)
         time = (Time.new.to_f * 1000).to_i
 
-        reads, writes = IO.readlines("/proc/diskstats").map { |l| parts = l.split; [parts[5].to_i, parts[7].to_i] }.inject([0, 0]) { |sum, vals| [sum[0] + vals[0], sum[1] + vals[1]] }
+        reads, writes = IO.readlines("/proc/diskstats").map { |l| parts = l.split; [parts[5].to_i, parts[9].to_i] }.inject([0, 0]) { |sum, vals| [sum[0] + vals[0], sum[1] + vals[1]] }
 
         if first_time
           first_time = false
@@ -28,7 +28,7 @@ class DataProviders::DiskActivity
   end
 
   def get
-    { :reads => @reads_sec / 1024.0, :writes => @writes_sec / 1024.0 }
+    { :reads => @reads_sec / 1024.0 / 1024.0, :writes => @writes_sec / 1024.0 / 1024.0 }
   end
 
   def renderer
