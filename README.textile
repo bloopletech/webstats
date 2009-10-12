@@ -24,7 +24,7 @@ The server application will warn you of any of these statistics indicate a probl
 
 You can configure at what thresholds the warnings get generated, as well as the URL's to monitor, by editing ~/.webstats. This file is generated the first time you run webstats, so it's pre-filled with sensible defaults; but you can change them as you see fit.
 
-You can prevent public access to your webstats by invoking the server application with a single argument (e.g. ruby webstats.rb <password>). Then, when you visit the webstats, you'll be prompted for a username and password; the username is always 'webstats', and the password is the password specified just above.
+You can prevent public access to your webstats by invoking the server application with a single argument (e.g. ruby webstats.rb <password to use>). Then, when you visit the webstats, you'll be prompted for a username and password; the username is always 'webstats', and the password is the password specified just above.
 
 The server application requires Linux kernel 2.6+, will not work in *BSD or OS X; the server application requires only Ruby; it does not rely on rubygems or any external libraries that aren't included with Ruby; the server application uses very little RAM, approximately 10MB.
 
