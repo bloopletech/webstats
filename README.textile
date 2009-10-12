@@ -70,7 +70,7 @@ To install the server app, ssh into the computer you want to monitor. then run:
 To run the server app, ssh into the computer you want to monitor. then run:
 <pre><code>~$ cd webstats
 ~/webstats$ ruby server/webstats.rb
-</pre></code>
+</code></pre>
 
 h2. Todo
 
