@@ -1,6 +1,6 @@
 h1. Email notifier for Webstats
 
-The email notifier montiros one or more servers and emails you whenever the server is in danger or could be in danger soon - for example, running out of hard drive space.
+The email notifier montiors one or more servers and emails you whenever the server is in danger or could be in danger soon - for example, running out of hard drive space.
 
 h2. Usage
 

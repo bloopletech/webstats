@@ -51,7 +51,7 @@ Many notifiers can also be run on the server, in the same ruby process as teh we
 h2. Installation
 
 You can now install webstats using rubygems; this saves you a bit of hassle. To install webstats on the server via rubygems, ensure github gems are in your gems sources; then run:
-<pre><code>~$ sudo gem install bloopletech-webstats</code></pre>
+<pre><code>~$ sudo gem install webstats</code></pre>
 
 To run the server application, run:
 <pre><code>~$ webstats</code></pre>
