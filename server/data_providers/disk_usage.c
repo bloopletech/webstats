@@ -3,13 +3,14 @@
 
 static VALUE get_disk_usage(VALUE self, VALUE mount_point)
 {
-   char* mount_point_str = RSTRING(mount_point)->ptr;
+   struct statvfs result;
+   char* mount_point_str = RSTRING_PTR(mount_point);
 
    VALUE out_hash = rb_hash_new();
    rb_hash_aset(out_hash, rb_str_new2("free"), Qnil);
    rb_hash_aset(out_hash, rb_str_new2("total"), Qnil);
 
-   struct statvfs result;
+   //struct statvfs result;  <-- ISO C90 forbids mixed declarations and code
 
    if(statvfs(mount_point_str, &result) == 0)
    {
